@@ -1,0 +1,250 @@
+<!DOCTYPE html><html lang="es"><meta charset="utf-8"><title>DataInsight WWI · Memoria final</title><style>@page{size:Letter;margin:18mm}*{box-sizing:border-box}body{font-family:Segoe UI,Arial,sans-serif;color:#172326;background:#edf0f1;font-size:11pt;line-height:1.4;margin:0}.page{background:white;max-width:216mm;min-height:260mm;margin:18px auto;padding:18mm;break-after:page}h1{font-size:24pt;color:black}h2{font-size:18pt;color:black;margin-top:0}h3{font-size:12pt;color:black}p{margin:0 0 10px}table{border-collapse:collapse;width:100%;margin:12px 0;font-size:9.5pt}th,td{text-align:left;vertical-align:top;padding:7px;border-bottom:1px solid #ccd8d9}th{background:#e5efee}.small{font-size:9pt}.shot{height:150px;border:1px dashed #8b9da1;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:12px 0;color:#456268}.field{display:block;margin:15px 0}.field span{display:block;min-height:30px;border:1px solid #8ba3a7;padding:3px}svg{width:100%;height:auto}@media print{body{background:white}.page{margin:0;padding:0;min-height:0;max-width:none}tr,.shot{break-inside:avoid}h2,h3{break-after:avoid}}</style><section class="page"><h1>DATAINSIGHT WWI</h1><h2>Memoria final del proyecto universitario</h2><p>Datos, visualización, seguridad e inteligencia experimental</p>
+<label class="field">Universidad<span contenteditable="true" role="textbox" aria-label="Universidad"></span></label>
+<label class="field">Carrera<span contenteditable="true" role="textbox" aria-label="Carrera"></span></label>
+<label class="field">Asignatura<span contenteditable="true" role="textbox" aria-label="Asignatura"></span></label>
+<label class="field">Docente<span contenteditable="true" role="textbox" aria-label="Docente"></span></label>
+<label class="field">Integrantes<span contenteditable="true" role="textbox" aria-label="Integrantes"></span></label>
+<label class="field">Lugar<span contenteditable="true" role="textbox" aria-label="Lugar"></span></label>
+<label class="field">Fecha de entrega<span contenteditable="true" role="textbox" aria-label="Fecha de entrega"></span></label>
+<p class="small">Complete la portada y las cinco capturas antes de entregar. Imprima o guarde para conservar cambios.</p></section>
+<section class='page'><h2>Resumen ejecutivo y objetivos</h2>
+<p>DataInsight WWI es una plataforma académica de análisis de ventas que integra extracción y calidad de datos, un Data Warehouse dimensional, una API protegida, visualizaciones web y dos módulos experimentales: pronóstico mensual y asistencia de negocio en español.</p>
+<p>El origen es Wide World Importers en SQL Server. La extracción completa documentada contiene 373.260 registros de cinco tablas; su transformación produce 304.001 registros dimensionales y de hechos en Supabase PostgreSQL. Los resultados corresponden al período 2013-01-01 a 2016-05-31. La moneda no está verificada.</p>
+<h3>Objetivo general</h3>
+<p>Construir una solución reproducible que convierta datos operacionales en indicadores verificables, con controles de acceso y límites explícitos para los componentes experimentales.</p>
+<h3>Objetivos específicos</h3>
+<p>Preservar el origen; validar su calidad; separar los granos de ventas y pedidos; publicar consultas de solo lectura; visualizar resultados; comparar pronósticos con evaluación temporal; y ofrecer explicaciones basadas únicamente en información autorizada.</p>
+<h3>Estado de la entrega</h3>
+<p>React y FastAPI funcionan localmente con Supabase en la nube. Existe una imagen Docker del backend probada localmente. No se dispone de evidencia de un frontend desplegado en Vercel ni de una API pública en producción.</p>
+<p class='small'>Método: revisión del repositorio y contraste entre código actual, DDL y documentación de cada etapa. Las cifras de pruebas son resultados históricos documentados; no se reejecutaron suites, cargas o entrenamiento al redactar esta memoria.</p>
+</section>
+<section class='page'><h2>1. Problema, alcance y tecnologías</h2>
+<p>Las tablas operacionales responden a transacciones, pero no ofrecen por sí solas una vista analítica consistente. Mezclar pedidos y líneas de factura sin definir su grano puede duplicar importes. Un gráfico o una respuesta en lenguaje natural necesita trazabilidad hasta indicadores conciliados.</p>
+<p>La solución separa adquisición, validación, modelado, consulta y presentación. Prioriza una demostración universitaria estable y de bajo costo en Windows 11 con recursos limitados.</p>
+<table><thead><tr><th>Capa</th><th>Tecnologías y responsabilidad</th></tr></thead><tbody>
+<tr><td>Origen</td><td>SQL Server Express, Wide World Importers y pyodbc con autenticación integrada de Windows.</td></tr>
+<tr><td>ETL</td><td>Python, CSV UTF-8 y decimal.Decimal; procesamiento por lotes y apoyo temporal en disco.</td></tr>
+<tr><td>Almacenamiento</td><td>Supabase PostgreSQL 17; esquemas dwh y app_security.</td></tr>
+<tr><td>Servicios</td><td>FastAPI, Pydantic y psycopg; consultas SELECT parametrizadas.</td></tr>
+<tr><td>Interfaz</td><td>React, TypeScript, Vite y ECharts; cliente oficial de Supabase Auth.</td></tr>
+<tr><td>Experimentación</td><td>pandas y Scikit-learn fuera de línea; Ollama con qwen3:1.7b opcional.</td></tr>
+<tr><td>Empaquetado</td><td>Docker Desktop sobre WSL2; imagen Linux del backend, sin ETL ni entrenamiento.</td></tr>
+</tbody></table>
+<h3>Fuera de alcance</h3>
+<p>No hay cargas incrementales, administración web de roles ni entrenamiento por petición. El asistente no ejecuta SQL o comandos. No se presenta la solución como certificación formal de seguridad ni como sistema financiero con moneda confirmada.</p>
+</section>
+<section class='page'><h2>2. Arquitectura general</h2>
+<svg viewBox="0 0 508 310" role="img" aria-label="Arquitectura de DataInsight WWI"><defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6" fill="none" stroke="#55777b"/></marker></defs><line x1="150" y1="57" x2="179" y2="57" stroke="#55777b" marker-end="url(#a)"/><line x1="329" y1="57" x2="358" y2="57" stroke="#55777b" marker-end="url(#a)"/><line x1="433" y1="84" x2="285" y2="135" stroke="#55777b" marker-end="url(#a)"/><line x1="150" y1="164" x2="179" y2="164" stroke="#55777b" marker-end="url(#a)"/><line x1="329" y1="164" x2="358" y2="164" stroke="#55777b" marker-end="url(#a)"/><line x1="254" y1="242" x2="254" y2="191" stroke="#55777b" marker-end="url(#a)"/><line x1="150" y1="271" x2="179" y2="271" stroke="#55777b" marker-end="url(#a)"/><line x1="433" y1="242" x2="329" y2="185" stroke="#55777b" marker-end="url(#a)"/><line x1="75" y1="135" x2="75" y2="105" stroke="#55777b" marker-end="url(#a)"/><line x1="75" y1="105" x2="433" y2="105" stroke="#55777b" marker-end="url(#a)"/><line x1="433" y1="105" x2="433" y2="84" stroke="#55777b" marker-end="url(#a)"/><rect x="0" y="28" width="150" height="56" rx="5" fill="#edf5f4" stroke="#afc7c8"/><text x="75" y="51" text-anchor="middle" font-size="11">SQL Server WWI</text><text x="75" y="71" text-anchor="middle" font-size="9">Origen local</text><rect x="179" y="28" width="150" height="56" rx="5" fill="#edf5f4" stroke="#afc7c8"/><text x="254" y="51" text-anchor="middle" font-size="11">ETL manual</text><text x="254" y="71" text-anchor="middle" font-size="9">RAW &gt; VALIDATED &gt; READY</text><rect x="358" y="28" width="150" height="56" rx="5" fill="#edf5f4" stroke="#afc7c8"/><text x="433" y="51" text-anchor="middle" font-size="11">Supabase DWH</text><text x="433" y="71" text-anchor="middle" font-size="9">PostgreSQL · nube</text><rect x="0" y="135" width="150" height="56" rx="5" fill="#edf5f4" stroke="#afc7c8"/><text x="75" y="158" text-anchor="middle" font-size="11">ML fuera de línea</text><text x="75" y="178" text-anchor="middle" font-size="9">Agregados &gt; JSON</text><rect x="179" y="135" width="150" height="56" rx="5" fill="#edf5f4" stroke="#afc7c8"/><text x="254" y="158" text-anchor="middle" font-size="11">FastAPI</text><text x="254" y="178" text-anchor="middle" font-size="9">JWT + RBAC + SELECT</text><rect x="358" y="135" width="150" height="56" rx="5" fill="#edf5f4" stroke="#afc7c8"/><text x="433" y="158" text-anchor="middle" font-size="11">Ollama local</text><text x="433" y="178" text-anchor="middle" font-size="9">Opcional · sin SQL</text><rect x="0" y="242" width="150" height="56" rx="5" fill="#edf5f4" stroke="#afc7c8"/><text x="75" y="265" text-anchor="middle" font-size="11">Supabase Auth</text><text x="75" y="285" text-anchor="middle" font-size="9">Sesión ES256 · nube</text><rect x="179" y="242" width="150" height="56" rx="5" fill="#edf5f4" stroke="#afc7c8"/><text x="254" y="265" text-anchor="middle" font-size="11">React / Vite</text><text x="254" y="285" text-anchor="middle" font-size="9">Interfaz local</text><rect x="358" y="242" width="150" height="56" rx="5" fill="#edf5f4" stroke="#afc7c8"/><text x="433" y="265" text-anchor="middle" font-size="11">JSON predicción</text><text x="433" y="285" text-anchor="middle" font-size="9">Artefacto validado</text></svg>
+<p>El navegador se autentica con Supabase Auth y envía el access token a FastAPI. La API valida sesión y rol antes de acceder a datos, predicciones o al asistente. React no se conecta directamente a PostgreSQL.</p>
+<p>El ETL permanece separado del acceso web. Los pronósticos se entrenan fuera de línea y se publican en JSON validado; FastAPI lee el artefacto sin cargar modelos pesados ni reentrenar.</p>
+<h3>Límites de confianza y despliegue</h3>
+<p>Supabase aloja Auth y el DWH. React/Vite, FastAPI, SQL Server y Ollama se han utilizado localmente. Docker contiene solo el backend y requiere variables y artefactos de ejecución independientes.</p>
+<p class='small'>Las flechas representan flujos de información autorizados, no un despliegue público. La integración de Docker con PostgreSQL real y Ollama no se presume por las pruebas de health.</p>
+</section>
+<section class='page'><h2>3. Origen e indicadores de negocio</h2>
+<p>Wide World Importers es la base de ejemplo de Microsoft utilizada como origen. Se extraen cinco tablas; las exploraciones de otras tablas no implican su inclusión en el pipeline.</p>
+<table><thead><tr><th>Tabla de origen</th><th>Filas documentadas</th></tr></thead><tbody>
+<tr><td>Sales.Orders</td><td>73.595</td></tr>
+<tr><td>Sales.Invoices</td><td>70.510</td></tr>
+<tr><td>Sales.InvoiceLines</td><td>228.265</td></tr>
+<tr><td>Sales.Customers</td><td>663</td></tr>
+<tr><td>Warehouse.StockItems</td><td>227</td></tr>
+<tr><td>Total</td><td>373.260</td></tr>
+</tbody></table>
+<h3>Los seis KPI originales</h3>
+<table><thead><tr><th>Indicador</th><th>Resultado registrado</th></tr></thead><tbody>
+<tr><td>Ventas</td><td>Sin impuestos: 172.261.341,20; impuestos: 25.782.098,25; total: 198.043.439,45; sobre 228.265 líneas.</td></tr>
+<tr><td>Facturas</td><td>70.510; todas las comprobadas con IsCreditNote = 0.</td></tr>
+<tr><td>Productos por cantidad</td><td>Ranking por cantidad y PackageTypeID; líder StockItemID 191 con 207.324 unidades.</td></tr>
+<tr><td>Clientes por ventas</td><td>Líder CustomerID 149 con 381.585,35 de ventas sin impuestos.</td></tr>
+<tr><td>Evolución mensual</td><td>41 meses, enero de 2013 a mayo de 2016; suma sin impuestos: 172.261.341,20.</td></tr>
+<tr><td>Pedidos sin factura</td><td>73.595 pedidos; 70.510 con factura y 3.085 sin factura (4,19 %).</td></tr>
+</tbody></table>
+<p class='small'>El dashboard actual ordena productos por ventas sin impuestos, no por cantidad. No se completan los diez puestos originales con resultados que no constan en la documentación. No se asigna símbolo monetario.</p>
+</section>
+<section class='page'><h2>4. ETL: extracción y orquestación manual</h2>
+<table><thead><tr><th>Etapa</th><th>Comportamiento implementado</th></tr></thead><tbody>
+<tr><td>RAW</td><td>extraer_raw.py: muestra de 100 filas predeterminada; extracción completa explícita. Tablas permitidas fijas, orden por clave y fetchmany, inicialmente en lotes de 500.</td></tr>
+<tr><td>VALIDATED</td><td>validar_raw.py: lectura por lotes, reglas, archivos válidos y cuarentena; conserva RAW y reporta filas y errores.</td></tr>
+<tr><td>READY</td><td>preparar_ready.py: dimensiones y hechos, claves reproducibles, referencias y conciliaciones de importes y agregados.</td></tr>
+<tr><td>DWH</td><td>cargar_dwh_supabase.py: dry-run predeterminado; --execute para carga expresamente autorizada, transaccional y con dimensiones antes de hechos.</td></tr>
+<tr><td>Pipeline</td><td>ejecutar_pipeline.py: reutiliza las etapas en orden y termina en simulación DWH; no habilita carga remota automática.</td></tr>
+</tbody></table>
+<p>Cada ejecución conserva identificador y rutas. Se escriben archivos temporales y solo se publican al completar correctamente. El orquestador impide simultaneidad y se detiene ante errores o registros rechazados.</p>
+<p>El procesamiento por lotes y el uso de índices temporales en disco evitan cargar tablas completas en memoria. El ETL no se expone por HTTP.</p>
+<h3>Consistencia e idempotencia</h3>
+<p>Se compara con COUNT_BIG de origen, pero no se implementa una instantánea transaccional. Los conteos no garantizan consistencia ante cambios concurrentes.</p>
+<p>Una nueva extracción genera otra procedencia raw_run_id. El cargador no sobrescribe un DWH existente con procedencia diferente solo porque coincidan los importes; requiere revisión manual, sin forzar borrados.</p>
+<p class='small'>Las pruebas del orquestador utilizan mocks. Su incorporación no demuestra una nueva ejecución integral remota; los resultados de datos proceden de las etapas completas documentadas.</p>
+</section>
+<section class='page'><h2>5. Calidad, conciliación y trazabilidad</h2>
+<p>Se comprueban claves primarias nulas o duplicadas, campos obligatorios, tipos, fechas y valores numéricos según las columnas reales. Cada rechazo identifica fila y regla; RAW permanece sin transformaciones.</p>
+<table><thead><tr><th>Control</th><th>Resultado y límite</th></tr></thead><tbody>
+<tr><td>Validación completa</td><td>373.260 filas válidas y cero rechazadas en las cinco tablas.</td></tr>
+<tr><td>Advertencias</td><td>4.626 LineProfit:NEGATIVO conservadas; no se convierten automáticamente en errores.</td></tr>
+<tr><td>Importes por línea</td><td>Diferencia absoluta entre ExtendedPrice y Quantity × UnitPrice + TaxAmount no superior a 0,01. Tolerancia provisional.</td></tr>
+<tr><td>SQL de origen</td><td>No se detectaron duplicados, relaciones huérfanas ni diferencias monetarias mayores de 0,01 en las comprobaciones realizadas; tampoco facturas anteriores al pedido.</td></tr>
+<tr><td>Referencias READY</td><td>Ocho comprobaciones de relaciones completas sin referencias ausentes.</td></tr>
+<tr><td>Agregados READY</td><td>Conciliación de líneas, pedidos, facturas, clientes y 41 meses conforme al perfil de referencia.</td></tr>
+</tbody></table>
+<h3>Pendientes y límites</h3>
+<p>Las muestras independientes de 100 filas no permiten validar relaciones completas. Las claves foráneas se comprueban sobre la extracción completa o relacionada.</p>
+<p>La conciliación completa de la sección 7 del SQL histórico y la validación detallada de impuestos continúan pendientes. Las conciliaciones posteriores de READY y DWH no cierran automáticamente esos apartados.</p>
+<p class='small'>La tolerancia por línea no demuestra exactitud fiscal ni autoriza diferencias acumuladas arbitrarias. Los conteos de referencia describen esta extracción, no constantes universales.</p>
+</section>
+<section class='page'><h2>6. Data Warehouse dimensional</h2>
+<p>FactVentas tiene una fila por InvoiceLineID; FactPedidos, una fila por OrderID. InvoiceID y OrderID son identificadores degenerados en ventas. La separación evita duplicar importes al analizar pedidos.</p>
+<table><thead><tr><th>Tabla física</th><th>Grano y filas</th></tr></thead><tbody>
+<tr><td>dwh.dim_fecha</td><td>Fecha, más desconocido 0: 1.249.</td></tr>
+<tr><td>dwh.dim_cliente</td><td>Cliente de origen, más desconocido 0: 664.</td></tr>
+<tr><td>dwh.dim_producto</td><td>Producto de origen, más desconocido 0: 228.</td></tr>
+<tr><td>dwh.fact_ventas</td><td>Línea de factura: 228.265.</td></tr>
+<tr><td>dwh.fact_pedidos</td><td>Pedido: 73.595.</td></tr>
+<tr><td>Total</td><td>304.001 registros.</td></tr>
+</tbody></table>
+<p>Las claves sustitutas son explícitas, estables y reproducibles. Cliente y producto usan BIGINT sin IDENTITY. El miembro desconocido 0 existe en dimensiones; no se asigna silenciosamente a hechos con referencias incorrectas.</p>
+<p>Hay 56 columnas físicas y 54 campos insertables: PostgreSQL calcula ventas_sin_impuestos y tiene_factura. Se conservan NUMERIC y Decimal para importes, DATE para fechas, claves primarias y foráneas, restricciones e índices.</p>
+<h3>Fórmulas y decisiones</h3>
+<p>Ventas sin impuestos = Quantity × UnitPrice; impuestos = TaxAmount; total = ExtendedPrice. El cliente comercial procede de Invoices.CustomerID y puede diferir de BillToCustomerID.</p>
+<p class='small'>La dimensión fecha llega a 2016-06-01 por entregas previstas; no añade otro mes de ventas. No se implementa historial SCD tipo 2. El KPI de clientes excluye el desconocido: 663 clientes frente a 664 filas dimensionales.</p>
+</section>
+<section class='page'><h2>7. Backend FastAPI y contratos</h2>
+<p>La API usa el lector dedicado, SELECT parametrizados y transacciones de lectura. No utiliza las credenciales administrativas del ETL ni permite SQL generado por IA.</p>
+<table><thead><tr><th>Ruta</th><th>Función</th></tr></thead><tbody>
+<tr><td>GET /api/v1/health</td><td>Pública, sin consultar la base: estado, nombre y versión.</td></tr>
+<tr><td>GET /api/v1/auth/me</td><td>Identidad y rol efectivo autorizado.</td></tr>
+<tr><td>GET /api/v1/kpis</td><td>Ventas, impuestos, total, facturas, pedidos y clientes.</td></tr>
+<tr><td>GET /api/v1/ventas/por-mes</td><td>Año, mes, importe y cantidad de facturas.</td></tr>
+<tr><td>GET /api/v1/productos/top</td><td>Ventas sin impuestos; limit 1–50, predeterminado 10.</td></tr>
+<tr><td>GET /api/v1/clientes/top</td><td>Ranking comercial con el mismo límite.</td></tr>
+<tr><td>GET /api/v1/predicciones/ventas</td><td>Modelo, métricas, período, pronósticos y bandas.</td></tr>
+<tr><td>POST /api/v1/asistente/consultar</td><td>Consulta autorizada sobre cinco temas soportados.</td></tr>
+</tbody></table>
+<p>Pydantic valida entradas y respuestas. Los importes se serializan como cadenas decimales exactas. Las consultas respetan los granos y evitan multiplicaciones por joins.</p>
+<h3>Errores y protección</h3>
+<p>401: sesión ausente o inválida; 403: permiso insuficiente; 429: límite del asistente; 503: fuente no disponible. Las denegaciones ocurren antes de consultas analíticas, lectura ML o llamadas a Ollama.</p>
+<p class='small'>La documentación interactiva es configurable y está deshabilitada en la imagen Docker de entrega. No se presenta un endpoint administrativo de roles.</p>
+</section>
+<section class='page'><h2>8. Dashboard React y experiencia de uso</h2>
+<p>React, TypeScript, Vite y ECharts presentan seis tarjetas KPI, la serie mensual y rankings según permisos. El diseño conserva barra lateral oscura, tarjetas claras y acentos verde azulado.</p>
+<p>Los cuatro endpoints analíticos son reales. Se incluyen carga, error, reintento y ausencia de datos; no hay sustitución silenciosa por cifras ficticias. Los importes decimales se presentan sin asumir moneda.</p>
+<p>La interfaz es responsiva. La tabla de pronósticos utiliza desplazamiento horizontal interno en móvil y conserva las cuatro columnas y todos los importes.</p>
+<div class='shot'><strong>Captura 1 · Dashboard</strong><span>PENDIENTE INSERTAR CAPTURA REAL</span></div><p class='small'>Insertar una captura local real de tarjetas y serie mensual. Evitar nombres de clientes, correos y datos de cuenta.</p>
+<p class='small'>Existen verificaciones visuales documentadas de escritorio y móvil de 493 px y 375 px. Son comprobaciones puntuales, no una certificación completa de accesibilidad o compatibilidad.</p>
+</section>
+<section class='page'><h2>9. Machine Learning: comparación temporal</h2>
+<p>Se comparan último valor, promedio móvil de tres meses y Ridge con variables temporales y rezagos. La evaluación walk-forward respeta el orden temporal y un horizonte de tres meses.</p>
+<p>La serie tiene 41 meses consecutivos. El modo conservador excluye el último y utiliza 40. El experimento publicado usa 41 mediante declaración explícita de cobertura hasta mayo de 2016; esto no certifica su completitud.</p>
+<p>La selección utiliza entrenamiento expansivo, 12 orígenes y 36 pares origen-horizonte; los últimos tres meses se reservan para holdout. Los pares se superponen: no son observaciones independientes.</p>
+<h3>Selección fuera de muestra</h3>
+<table><thead><tr><th>Modelo</th><th>MAE</th><th>RMSE</th><th>sMAPE</th></tr></thead><tbody>
+<tr><td>Último valor</td><td>371.324,16</td><td>467.571,52</td><td>8,21 %</td></tr>
+<tr><td>Promedio móvil 3</td><td>266.657,84</td><td>352.555,70</td><td>5,91 %</td></tr>
+<tr><td>Ridge</td><td>279.193,70</td><td>335.204,14</td><td>6,19 %</td></tr>
+</tbody></table>
+<h3>Holdout</h3>
+<table><thead><tr><th>Modelo</th><th>MAE</th><th>RMSE</th><th>sMAPE</th></tr></thead><tbody>
+<tr><td>Último valor</td><td>721.000,73</td><td>742.156,60</td><td>16,44 %</td></tr>
+<tr><td>Promedio móvil 3</td><td>478.659,93</td><td>525.116,56</td><td>10,60 %</td></tr>
+<tr><td>Ridge</td><td>211.127,22</td><td>275.385,48</td><td>4,47 %</td></tr>
+</tbody></table>
+<p>Se selecciona el promedio móvil por su MAE de selección. Ridge es mejor en el holdout; no se cambia retrospectivamente el ganador ni se afirma superioridad general.</p>
+<p class='small'>MAE y RMSE usan la misma unidad no verificada de ventas; sMAPE es porcentual. No se entrena desde las solicitudes HTTP.</p>
+</section>
+<section class='page'><h2>10. Pronósticos históricos y sus límites</h2>
+<p>Los pronósticos se sitúan después del corte de mayo de 2016, no en el presente. FastAPI lee JSON validado; React lo combina con el histórico autorizado sin cargar el modelo de entrenamiento.</p>
+<table><thead><tr><th>Mes</th><th>Pronóstico</th><th>Inferior</th><th>Superior</th></tr></thead><tbody>
+<tr><td>Junio 2016</td><td>4.726.617,58</td><td>4.051.651,68</td><td>5.401.583,49</td></tr>
+<tr><td>Julio 2016</td><td>4.753.738,78</td><td>4.151.498,35</td><td>5.355.979,21</td></tr>
+<tr><td>Agosto 2016</td><td>4.817.096,34</td><td>4.144.432,87</td><td>5.489.759,80</td></tr>
+</tbody></table>
+<p>Las bandas se basan en errores absolutos históricos por horizonte. Son descriptivas: no son intervalos de confianza ni garantizan cobertura del 90 %. Redondear los valores publicados puede producir diferencias de un centavo.</p>
+<p>Mayo de 2016 no está certificado como completo. Llegar hasta el día 31 no demuestra que estén todas las operaciones. No se cuenta aquí con ventas reales de junio a agosto para evaluar estos pronósticos.</p>
+<div class='shot'><strong>Captura 2 · Predicciones</strong><span>PENDIENTE INSERTAR CAPTURA REAL</span></div><p class='small'>Mostrar histórico, estimaciones, bandas, métricas y la advertencia sobre mayo de 2016.</p>
+<p class='small'>«Pronóstico histórico experimental; no representa ventas actuales ni garantiza resultados futuros». La moneda no está verificada.</p>
+</section>
+<section class='page'><h2>11. Asistente de negocio con Ollama</h2>
+<p>El asistente admite preguntas en español sobre KPIs, evolución mensual, productos, clientes y pronósticos, siempre según permisos. El modo local determinista es gratuito y se etiqueta como respuestas basadas en reglas, no IA generativa.</p>
+<p>El proveedor opcional utiliza Ollama y qwen3:1.7b local. Si no está disponible o devuelve una estructura inválida, se aplica el modo local con indicación explícita.</p>
+<p>El modelo recibe contexto reducido y agregado, sin registros completos, credenciales ni datos personales de clientes. La salida estructurada se valida y la respuesta se reconstruye con hechos verificados. No dispone de herramientas para ejecutar SQL, código, comandos o lecturas arbitrarias de archivos.</p>
+<p>No se muestra el razonamiento interno. Se limitan entrada, tamaño, tiempo y concurrencia. La integración local documenta respuestas HTTP 200 para los cinco temas; no equivale a una prueba de carga ni garantiza ausencia de alucinaciones.</p>
+<div class='shot'><strong>Captura 3 · Asistente</strong><span>PENDIENTE INSERTAR CAPTURA REAL</span></div><p class='small'>Usar KPIs o evolución mensual; mostrar modo efectivo, fuentes y advertencias. No incorporar datos personales.</p>
+<p class='small'>Se conservan las advertencias de moneda, pronóstico histórico, mayo no certificado y bandas sin cobertura garantizada. No se generan conclusiones causales inventadas.</p>
+</section>
+<section class='page'><h2>12. Supabase Auth y autorización RBAC</h2>
+<p>El cliente oficial gestiona correo y contraseña, sesión y renovación. FastAPI valida ES256 mediante JWKS oficial, firma, issuer, audience, expiración e identidad de sesión. Rechaza HS256 heredado sin copiar su secreto.</p>
+<p>El rol procede de app_security.user_roles usando exclusivamente el sub verificado y una consulta parametrizada. El esquema privado está separado de dwh; el lector solo obtiene user_id, role y enabled, sin escritura.</p>
+<table><thead><tr><th>Funcionalidad</th><th>VIEWER</th><th>ANALYST</th><th>ADMIN</th></tr></thead><tbody>
+<tr><td>Dashboard, KPIs y productos</td><td>Sí</td><td>Sí</td><td>Sí</td></tr>
+<tr><td>Clientes identificables</td><td>No</td><td>Sí</td><td>Sí</td></tr>
+<tr><td>Predicciones y asistente</td><td>No</td><td>Sí</td><td>Sí</td></tr>
+<tr><td>Roles por HTTP</td><td>No existe</td><td>No existe</td><td>No existe</td></tr>
+<tr><td>ETL o ML por HTTP</td><td>No existe</td><td>No existe</td><td>No existe</td></tr>
+</tbody></table>
+<p>La API deniega rutas sin política. Usuarios sin rol, deshabilitados o con rol desconocido reciben 403; el fallo de la fuente de roles devuelve 503. React solo adapta la visibilidad: no decide la autorización.</p>
+<div class='shot'><strong>Captura 4 · Menú y rol</strong><span>PENDIENTE INSERTAR CAPTURA REAL</span></div><p class='small'>Capturar distintivo y menú; ocultar correo, UUID y toda respuesta de identidad. No mostrar tokens.</p>
+<p class='small'>La cuenta con SELECT puede consultar las filas permitidas por ese privilegio; no hay aislamiento criptográfico por usuario en PostgreSQL. ADMIN de la aplicación no es administrador de la base. No existe interfaz de administración de roles.</p>
+</section>
+<section class='page'><h2>13. Docker: backend ligero y aislado</h2>
+<table><thead><tr><th>Aspecto</th><th>Resultado documentado</th></tr></thead><tbody>
+<tr><td>Imagen</td><td>datainsight-wwi-backend:entrega-20261115; Linux amd64.</td></tr>
+<tr><td>Tamaño</td><td>235 MB de uso en disco y 57 MB de contenido; son medidas diferentes.</td></tr>
+<tr><td>Recursos</td><td>Una CPU, 512 MiB sin swap adicional, 64 PIDs y un worker.</td></tr>
+<tr><td>Muestra puntual</td><td>50,3 MiB y 0,25 % de CPU; no es prueba de carga.</td></tr>
+<tr><td>Seguridad</td><td>Usuario sin privilegios, raíz de solo lectura y capacidades reducidas.</td></tr>
+<tr><td>Pruebas</td><td>Health 200; siete rutas privadas anónimas 401; token inválido 401; documentación 404.</td></tr>
+<tr><td>Puerto</td><td>8001 local, sin reemplazar el backend habitual en 8000.</td></tr>
+</tbody></table>
+<p>La imagen excluye .env, datos, entorno virtual, frontend, dependencias de entrenamiento y Ollama. La prueba no incluyó credenciales reales PostgreSQL: una integración de negocio necesita variables exclusivas del lector y el artefacto JSON montado en solo lectura.</p>
+<div class='shot'><strong>Captura 5 · Docker</strong><span>PENDIENTE INSERTAR CAPTURA REAL</span></div><p class='small'>Mostrar imagen, estado, puerto o health. No mostrar variables ni comandos que contengan secretos.</p>
+<p class='small'>No pasar el .env completo del ETL. Ollama sigue fuera del contenedor; su conectividad requiere revisión. No existe evidencia de un despliegue público.</p>
+</section>
+<section class='page'><h2>14. Pruebas y resultados</h2>
+<p>Se presentan evidencias de etapas distintas, sin sumarlas como una única suite actual ni atribuirlas a una nueva ejecución durante esta redacción.</p>
+<table><thead><tr><th>Etapa</th><th>Resultado registrado</th><th>Alcance</th></tr></thead><tbody>
+<tr><td>Seguridad y estabilidad</td><td>358 backend; 91 frontend; TypeScript y build correctos.</td><td>Pruebas locales, regresión y escenarios negativos.</td></tr>
+<tr><td>ETL y orquestación</td><td>114 pruebas; incluye 16 nuevas del orquestador.</td><td>Mocks: no cargas reales en pruebas unitarias.</td></tr>
+<tr><td>Machine Learning</td><td>20 pruebas sintéticas.</td><td>Serie, variables, fuga temporal y predicción.</td></tr>
+<tr><td>Calidad completa</td><td>373.260 válidas; cero rechazadas.</td><td>4.626 advertencias conservadas.</td></tr>
+<tr><td>DWH y API</td><td>304.001 registros en cinco tablas; totales conciliados.</td><td>Integración real de lectura documentada.</td></tr>
+<tr><td>Docker</td><td>Health y rutas protegidas verificados localmente.</td><td>No integración completa con lector real o artefacto montado.</td></tr>
+</tbody></table>
+<h3>Conciliación central</h3>
+<p>228.265 líneas únicas; 70.510 facturas; 73.595 pedidos; 3.085 pedidos sin factura. Ventas sin impuestos: 172.261.341,20; impuestos: 25.782.098,25; total: 198.043.439,45.</p>
+<p>La integración real ADMIN fue probada localmente. La matriz de ANALYST y VIEWER tiene pruebas automatizadas; no se atribuyen pruebas manuales remotas a cuentas no documentadas.</p>
+<p class='small'>La auditoría registró cero alertas npm y una revisión OSV sin hallazgos sobre 14 paquetes Python seleccionados. El alcance fue parcial, no una garantía permanente. El build conserva advertencia por tamaño del chunk de ECharts.</p>
+</section>
+<section class='page'><h2>15. Limitaciones y conclusiones</h2>
+<h3>Datos y operación</h3>
+<p>No hay instantánea de extracción, incremental ni reconciliación automática de una nueva procedencia con el DWH existente. Quedan pendientes la validación detallada de impuestos y el cierre formal de la sección 7 del SQL original.</p>
+<p>La moneda no está confirmada y mayo de 2016 requiere verificación de completitud. La serie es pequeña: los pronósticos y bandas no deben utilizarse como garantías comerciales actuales.</p>
+<h3>Seguridad y despliegue</h3>
+<p>Se aplican mínimo privilegio, SQL parametrizado, denegación predeterminada, errores genéricos, límites HTTP y cabeceras sin caché. El límite del asistente es por usuario y proceso, no distribuido.</p>
+<p>La sesión usa sessionStorage, accesible a JavaScript: XSS sigue siendo un riesgo residual. MFA, registro de usuarios y controles de producción necesitan verificación. No se afirma cumplimiento formal OWASP ASVS.</p>
+<p>Vercel y una API pública continúan pendientes de verificación: requieren HTTPS, CORS exacto, secretos de ejecución, conectividad del lector, artefactos de solo lectura y pruebas completas tras el despliegue.</p>
+<h3>Conclusión</h3>
+<p>La plataforma demuestra una cadena trazable entre origen operacional e indicadores conciliados, con granos separados para ventas y pedidos y autorización efectiva en la API.</p>
+<p>Su valor académico reside en integrar ingeniería de datos, visualización, seguridad y experimentación con límites explícitos. La siguiente prioridad es estabilizar y verificar el despliegue antes de ampliar funcionalidades.</p>
+</section>
+<section class='page'><h2>16. Referencias y trazabilidad</h2>
+<p>Fuentes internas: README, documentación y código de DataInsight WWI. Las guías históricas se contrastaron con el DDL y el código actual para evitar presentar planes antiguos como funcionalidades vigentes.</p>
+<table><thead><tr><th>Área</th><th>Fuentes del repositorio</th></tr></thead><tbody>
+<tr><td>Origen y calidad</td><td>Guías 02–04; database/source/.</td></tr>
+<tr><td>ETL</td><td>Guías 06–08, 10, 13 y 22; etl/ y sus pruebas.</td></tr>
+<tr><td>Modelo</td><td>Guía 09; database/data-warehouse/03_creacion_tablas_dwh.sql.</td></tr>
+<tr><td>API e interfaz</td><td>Guías 14–17 y 19; backend/app/ y frontend/src/.</td></tr>
+<tr><td>ML y asistente</td><td>Guías 18, 20 y 21; machine-learning/ y servicios del asistente.</td></tr>
+<tr><td>Seguridad y Docker</td><td>Guías 23–27; database/security/, configuración, Dockerfile y pruebas.</td></tr>
+</tbody></table>
+<h3>Documentación oficial</h3>
+<p class='small'>Microsoft · Wide World Importers: https://learn.microsoft.com/en-us/sql/samples/wide-world-importers-what-is</p>
+<p class='small'>Supabase · Auth: https://supabase.com/docs/guides/auth</p>
+<p class='small'>FastAPI: https://fastapi.tiangolo.com/ · React: https://react.dev/</p>
+<p class='small'>ECharts: https://echarts.apache.org/handbook/en/get-started/</p>
+<p class='small'>Scikit-learn · Ridge: https://scikit-learn.org/stable/modules/linear_model.html#ridge-regression</p>
+<p class='small'>Ollama · API: https://docs.ollama.com/api/introduction</p>
+<p class='small'>Docker · Build best practices: https://docs.docker.com/build/building/best-practices/</p>
+<p class='small'>OWASP · Authorization: https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html</p>
+<p class='small'>Las referencias oficiales describen las tecnologías. Los resultados numéricos proceden del repositorio. No se incluyeron credenciales, usuarios personales ni capturas sin revisar.</p>
+</section>
+</html>
