@@ -18,7 +18,7 @@ def test_swagger_and_openapi(client):
     schema=client.get('/openapi.json').json()
     assert schema['info']['title']=='DataInsight WWI'
     assert schema['info']['version']==__version__
-    assert set(schema['paths'])=={'/api/v1/health','/api/v1/kpis','/api/v1/ventas/por-mes','/api/v1/productos/top','/api/v1/clientes/top','/api/v1/predicciones/ventas'}
+    assert set(schema['paths'])=={'/api/v1/health','/api/v1/kpis','/api/v1/ventas/por-mes','/api/v1/productos/top','/api/v1/clientes/top','/api/v1/predicciones/ventas','/api/v1/asistente/consultar'}
 
 
 @pytest.mark.parametrize('path',['/api/v1/sales','/api/v1/clientes','/api/v1/productos'])
@@ -43,12 +43,14 @@ def test_cors_untrusted_origin_has_no_allow_header(client):
     assert 'access-control-allow-origin' not in response.headers
 
 
-def test_cors_preflight_allows_only_get(client):
+def test_cors_preflight_allows_get_and_post_only(client):
     headers={'Origin':'http://127.0.0.1:5173','Access-Control-Request-Method':'GET','Access-Control-Request-Headers':'Content-Type'}
     response=client.options('/api/v1/health',headers=headers)
     assert response.status_code==200
     assert response.headers['access-control-allow-origin']==headers['Origin']
     headers['Access-Control-Request-Method']='POST'
+    assert client.options('/api/v1/asistente/consultar',headers=headers).status_code==200
+    headers['Access-Control-Request-Method']='DELETE'
     assert client.options('/api/v1/health',headers=headers).status_code==400
 
 

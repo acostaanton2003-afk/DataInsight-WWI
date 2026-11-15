@@ -8,6 +8,7 @@ from backend.app.config import Settings, load_settings
 from backend.app.routers.health import router as health_router
 from backend.app.routers.analytics import router as analytics_router
 from backend.app.routers.predictions import router as predictions_router
+from backend.app.routers.assistant import router as assistant_router
 
 
 def create_app(settings: Settings | None=None):
@@ -16,11 +17,12 @@ def create_app(settings: Settings | None=None):
                           description='Analítica de ventas del DWH con conexión de solo lectura; health independiente.')
     application.state.settings = settings
     application.add_middleware(CORSMiddleware,allow_origins=list(settings.cors_origins),
-                               allow_credentials=False,allow_methods=['GET'],
+                               allow_credentials=False,allow_methods=['GET','POST'],
                                allow_headers=['Accept','Content-Type'])
     application.include_router(health_router)
     application.include_router(analytics_router)
     application.include_router(predictions_router)
+    application.include_router(assistant_router)
     return application
 
 

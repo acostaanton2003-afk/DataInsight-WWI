@@ -77,12 +77,33 @@ class ReadOnlyDatabaseSettings:
 
 
 @dataclass(frozen=True)
+class AssistantSettings:
+    provider: str = 'local'
+    model: str = field(default='',repr=False)
+    url: str = field(default='http://127.0.0.1:11434/api/chat',repr=False)
+    timeout: int = 30
+
+    def __post_init__(self):
+        if self.provider not in ('local','ollama') or type(self.timeout) is not int or not 1<=self.timeout<=60:
+            raise ValueError('Configuración del asistente inválida.')
+        parsed=urlsplit(self.url)
+        if parsed.scheme!='http' or parsed.hostname not in ('127.0.0.1','::1') or parsed.username or parsed.password or parsed.path!='/api/chat' or parsed.query or parsed.fragment:
+            raise ValueError('El proveedor opcional solo admite Ollama en loopback, sin credenciales.')
+        try:port=parsed.port
+        except ValueError:raise ValueError('Puerto del proveedor inválido.') from None
+        if port==0:raise ValueError('Puerto del proveedor inválido.')
+        if self.provider=='ollama' and (not self.model or len(self.model)>80 or any(c.isspace() for c in self.model) or ':cloud' in self.model.lower() or '-cloud' in self.model.lower()):
+            raise ValueError('Configurar el nombre de un modelo local ya instalado.')
+
+
+@dataclass(frozen=True)
 class Settings:
     host: str = '127.0.0.1'
     port: int = 8000
     cors_origins: tuple[str,...] = DEFAULT_ORIGINS
     database: ReadOnlyDatabaseSettings = field(default_factory=ReadOnlyDatabaseSettings,repr=False)
     forecast_path: str = field(default='artifacts/machine_learning/published/resumen.json',repr=False)
+    assistant: AssistantSettings = field(default_factory=AssistantSettings,repr=False)
 
     def __post_init__(self):
         object.__setattr__(self,'port',port_number(self.port))
@@ -112,4 +133,6 @@ def load_settings(env_file=ENV_FILE,environ: Mapping[str,str] | None=None):
                                        user=db('USER'),password=db('PASSWORD'),sslmode=db('SSLMODE','require'))
     return Settings(host=get('BACKEND_HOST','127.0.0.1'),port=get('BACKEND_PORT','8000'),
                     cors_origins=parse_origins(get('CORS_ORIGINS',','.join(DEFAULT_ORIGINS))),database=database,
-                    forecast_path=get('BACKEND_FORECAST_PATH','artifacts/machine_learning/published/resumen.json') or 'artifacts/machine_learning/published/resumen.json')
+                    forecast_path=get('BACKEND_FORECAST_PATH','artifacts/machine_learning/published/resumen.json') or 'artifacts/machine_learning/published/resumen.json',
+                    assistant=AssistantSettings(provider=get('ASSISTANT_PROVIDER','local'),model=get('ASSISTANT_OLLAMA_MODEL') or ('qwen3:1.7b' if get('ASSISTANT_PROVIDER','local')=='ollama' else ''),
+                        url=get('ASSISTANT_OLLAMA_URL','http://127.0.0.1:11434/api/chat'),timeout=int(get('ASSISTANT_LLM_TIMEOUT','30'))))
