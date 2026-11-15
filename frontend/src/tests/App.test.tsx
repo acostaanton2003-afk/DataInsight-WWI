@@ -1,6 +1,9 @@
 import {it,expect,vi} from 'vitest';
 import {render,screen,waitFor,fireEvent} from '@testing-library/react';
-import App from '../App';
+import {Dashboard} from '../App';
+import type {Identity} from '../lib/identity';
+const identity:Identity={user_id:'11111111-1111-4111-8111-111111111111',role:'ADMIN',permissions:['profile:read','general:read','customers:read','predictions:read','assistant:use','roles:manage']};
+function App(){return <Dashboard identity={identity} onSignOut={async()=>{}}/>;}
 import {kpis,months,products,customers,predictions} from './fixtures';
 vi.mock('../components/Chart',()=>({Chart:({label}:{label:string})=><div role="img" aria-label={label}/> }));
 function mockFetch(overrides:Record<string,unknown>={}) {
@@ -45,8 +48,8 @@ it('permite actualizar las cinco consultas',async()=>{
   fireEvent.click(screen.getByRole('button',{name:'Actualizar datos'}));
   await waitFor(()=>expect(fetch).toHaveBeenCalledTimes(10));
 });
-it('aborta solicitudes al desmontar',()=>{
+it('aborta solicitudes al desmontar',async()=>{
   const fetch=vi.fn((_url:string,_init?:RequestInit)=>new Promise(()=>{}));vi.stubGlobal('fetch',fetch);
-  const {unmount}=render(<App/>);const signal=fetch.mock.calls[0][1]!.signal as AbortSignal;
+  const {unmount}=render(<App/>);await waitFor(()=>expect(fetch).toHaveBeenCalled());const signal=fetch.mock.calls[0][1]!.signal as AbortSignal;
   unmount();expect(signal.aborted).toBe(true);
 });

@@ -1,4 +1,5 @@
 """Contratos HTTP; sin SQL libre ni credenciales en respuestas."""
+from backend.app.permissions import Permission, requires_permission
 from decimal import Decimal
 from typing import Annotated
 
@@ -59,20 +60,24 @@ def query_safely(operation,*args):
 
 
 @router.get('/kpis',response_model=KpisResponse,summary='Indicadores globales de ventas, pedidos y clientes')
+@requires_permission(Permission.GENERAL_READ)
 def kpis(repository=Depends(get_repository)):
     return query_safely(repository.kpis)
 
 
 @router.get('/ventas/por-mes',response_model=list[MonthlySalesResponse],summary='Ventas sin impuestos por mes de factura')
+@requires_permission(Permission.GENERAL_READ)
 def monthly(repository=Depends(get_repository)):
     return query_safely(repository.monthly)
 
 
 @router.get('/productos/top',response_model=list[TopProductResponse],summary='Productos por ventas sin impuestos')
+@requires_permission(Permission.GENERAL_READ)
 def products(limit: Limit=10,repository=Depends(get_repository)):
     return query_safely(repository.products,limit)
 
 
 @router.get('/clientes/top',response_model=list[TopCustomerResponse],summary='Clientes comerciales por ventas sin impuestos')
+@requires_permission(Permission.CUSTOMERS_READ)
 def customers(limit: Limit=10,repository=Depends(get_repository)):
     return query_safely(repository.customers,limit)

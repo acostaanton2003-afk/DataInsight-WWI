@@ -53,7 +53,9 @@ def protected_client(monkeypatch):
     monkeypatch.setattr('backend.app.routers.assistant.provider_for', forbidden)
     monkeypatch.setattr('backend.app.routers.predictions.read_predictions', forbidden)
     monkeypatch.setattr('backend.app.assistant_provider.OllamaProvider.generate', forbidden)
-    with TestClient(create_app(Settings(auth=AUTH))) as client:
+    application = create_app(Settings(auth=AUTH))
+    application.state.role_repository = Mock(find=Mock(return_value=None))
+    with TestClient(application) as client:
         yield client
 
 
@@ -125,6 +127,8 @@ def test_missing_session_claim(signing):
 
 def test_identity_dependency_and_no_token_retention(signing):
     app = create_app(Settings(auth=AUTH))
+    from backend.app.auth_dependencies import require_business_access
+    app.dependency_overrides[require_business_access] = lambda: None
     @app.get('/identity', dependencies=[])
     def identity(user=Depends(get_authenticated_user)):
         return {'user_id': str(user.user_id), 'session_id': str(user.session_id)}

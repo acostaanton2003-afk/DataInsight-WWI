@@ -109,3 +109,25 @@ FastAPI valida sesiones ES256 con JWKS. Health es público; los endpoints de neg
 responden 401 sin sesión y 403 con sesión válida hasta implementar permisos.
 El dashboard no tiene login todavía y recibirá 401.
 [Configuración, decisiones y pruebas](documentation/23_autenticacion_supabase_fase1.md).
+
+### Seguridad: RBAC y hardening, Fase 2
+
+FastAPI aplica permisos ADMIN/ANALYST/VIEWER con fuente privada de roles y denegación
+por defecto. VIEWER no puede consultar clientes, predicciones ni asistente. Se añaden
+límites de cuerpo HTTP, frecuencia del asistente y errores/cabeceras seguros.
+Los SQL privados están preparados **solo para revisión, sin ejecución remota**.
+Hasta instalarlos con aprobación, la fuente de roles no estará disponible (503 con
+sesión válida y política declarada). React sigue sin login (401).
+[Arquitectura, SQL y pruebas](documentation/24_autorizacion_rbac.md).
+
+La consulta RBAC usa únicamente el sub verificado como parámetro SQL, sin identidad
+basada en variables PostgreSQL. La política privada autoriza al lector de servicio a leer
+todas las asignaciones; no ofrece aislamiento de usuarios web dentro de PostgreSQL.
+
+### Seguridad: login React y sesión efectiva, Fase 3
+
+React incorpora login/logout con Supabase Auth y envía Bearer a FastAPI. El endpoint
+`GET /api/v1/auth/me` confirma el rol y permisos antes de mostrar datos. El usuario confirmó
+la instalación remota de roles y ADMIN; esta fase no ejecuta SQL. VIEWER no consulta
+clientes, ML ni asistente. Configurar la Publishable key pública en frontend/.env.local;
+no usar claves privilegiadas. [Instalación, pruebas y limitaciones](documentation/25_login_react_supabase.md).

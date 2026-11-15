@@ -1,4 +1,5 @@
-import {apiBase,object,text} from './api';
+import {object,text} from './api';
+import {requestJson} from './http';
 export interface AssistantAnswer {
   soportada:boolean;tema:string;modo:'reglas'|'llm_local_restringido';proveedor:'local'|'ollama';modelo:string|null;
   respuesta:{hechos:string[];interpretacion:string;limitaciones:string[]};
@@ -23,9 +24,5 @@ export function parseAssistant(value:unknown):AssistantAnswer {
     periodo:period,advertencias:strings(row.advertencias,8)};
 }
 export async function consultAssistant(question:string,signal:AbortSignal) {
-  const response=await fetch(`${apiBase(import.meta.env.VITE_API_BASE_URL||'http://127.0.0.1:8000')}/api/v1/asistente/consultar`,{
-    method:'POST',credentials:'omit',signal,headers:{Accept:'application/json','Content-Type':'application/json'},body:JSON.stringify({pregunta:question}),
-  });
-  if(!response.ok)throw new Error('No se pudo consultar el asistente.');
-  return parseAssistant(await response.json());
+  return parseAssistant(await requestJson('/api/v1/asistente/consultar', signal, {pregunta:question}));
 }

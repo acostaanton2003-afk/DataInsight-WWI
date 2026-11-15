@@ -1,9 +1,11 @@
+import {errorMessage} from '../lib/http';
 import {useEffect,useId,useRef,useState,type FormEvent} from 'react';
 import {consultAssistant,type AssistantAnswer} from '../lib/assistant';
 
 const EXAMPLES=['Dame un resumen de los KPI','¿Cómo evolucionan las ventas por mes?','¿Cuáles son los productos destacados?','¿Cuáles son los clientes destacados?','¿Cuáles son los pronósticos históricos?'];
 export function AssistantPanel(){
   const inputId=useId();const [question,setQuestion]=useState('');
+  const [failure,setFailure]=useState('');
   const [status,setStatus]=useState<'idle'|'loading'|'error'|'success'>('idle');
   const [answer,setAnswer]=useState<AssistantAnswer|null>(null);
   const controller=useRef<AbortController|null>(null);const lastQuestion=useRef('');
@@ -15,7 +17,7 @@ export function AssistantPanel(){
     lastQuestion.current=normalized;setStatus('loading');setAnswer(null);
     try {const result=await consultAssistant(normalized,current.signal);
       if(controller.current===current){setAnswer(result);setStatus('success');}
-    }catch{if(controller.current===current)setStatus('error');}
+    }catch(error){if(controller.current===current){setStatus('error');setFailure(errorMessage(error));}}
     finally{window.clearTimeout(timeout);}
   }
   function handleSubmit(event:FormEvent){event.preventDefault();void submit();}
@@ -30,7 +32,7 @@ export function AssistantPanel(){
       </form>
       {status==='idle'&&<p className="assistant-empty">Elige un ejemplo o escribe tu pregunta para comenzar.</p>}
       {status==='loading'&&<div className="assistant-loading" role="status"><span className="loader"/>Consultando indicadores autorizados…</div>}
-      {status==='error'&&<div className="assistant-error" role="alert"><strong>No se pudo completar la consulta.</strong><p>Comprueba FastAPI, el acceso lector y el artefacto de predicciones. No se muestran datos de reemplazo.</p><button className="button" onClick={()=>void submit(lastQuestion.current)}>Reintentar consulta</button></div>}
+      {status==='error'&&<div className="assistant-error" role="alert"><strong>No se pudo completar la consulta.</strong><p>{failure}</p><button className="button" onClick={()=>void submit(lastQuestion.current)}>Reintentar consulta</button></div>}
       {status==='success'&&answer&&<article className="assistant-answer" aria-label="Respuesta del asistente" aria-live="polite"><div className="assistant-mode">{answer.modo==='reglas'?'Reglas locales · no es IA generativa':`Ollama local${answer.modelo ? ` · ${answer.modelo}` : ''} · hechos validados`}</div>
         {answer.periodo&&<p className="assistant-period">Período: {answer.periodo.inicio} — {answer.periodo.fin}</p>}
         <h3>{answer.soportada?'Hechos verificables':'Consulta no soportada'}</h3>

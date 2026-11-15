@@ -1,3 +1,4 @@
+from backend.app.permissions import Permission, requires_permission
 from fastapi import APIRouter,Depends,HTTPException,Request,Response
 from pydantic import ValidationError
 from backend.app.analytics import AnalyticsRepository
@@ -12,6 +13,7 @@ def get_assistant_repository(request:Request):return AnalyticsRepository(request
 def get_assistant_provider(request:Request):return provider_for(request.app.state.settings.assistant)
 
 @router.post('/consultar',response_model=AssistantResponse,summary='Consulta de negocio acotada; reglas locales por defecto',responses={503:{'description':'Indicadores o artefacto no disponibles.'}})
+@requires_permission(Permission.ASSISTANT_USE)
 def consult(body:Question,request:Request,response:Response,repo=Depends(get_assistant_repository),provider=Depends(get_assistant_provider)):
     response.headers['Cache-Control']='no-store'
     if request.query_params:raise HTTPException(status_code=422,detail='No se admiten parámetros de consulta.')

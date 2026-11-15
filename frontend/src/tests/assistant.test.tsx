@@ -36,9 +36,9 @@ it('rechaza estructura, modos y fuentes arbitrarias',()=>{
   expect(()=>parseAssistant({...fixture,fuentes:[{nombre:'externa',ruta:'https://example.invalid'}]})).toThrow();
   expect(()=>parseAssistant({...fixture,respuesta:{hechos:'SQL'}})).toThrow();
 });
-it('aborta la consulta al desmontar',()=>{
+it('aborta la consulta al desmontar',async()=>{
   const fetch=vi.fn((_url:string,_options:RequestInit)=>new Promise(()=>{}));vi.stubGlobal('fetch',fetch);
-  const {unmount}=render(<AssistantPanel/>);submit();const signal=fetch.mock.calls[0][1].signal as AbortSignal;
+  const {unmount}=render(<AssistantPanel/>);submit();await waitFor(()=>expect(fetch).toHaveBeenCalled());const signal=fetch.mock.calls[0][1].signal as AbortSignal;
   unmount();expect(signal.aborted).toBe(true);
 });
 

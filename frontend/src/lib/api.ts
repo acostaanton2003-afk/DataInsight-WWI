@@ -1,3 +1,5 @@
+import {requestJson} from './http';
+export {apiBase} from './http';
 export interface Kpis {
   ventas_sin_impuestos: string; impuestos: string; total_facturado: string;
   cantidad_facturas: number; cantidad_pedidos: number; cantidad_clientes: number;
@@ -35,15 +37,6 @@ export const parseCustomers: Parser<Customer[]> = value => list(value, item => {
   const row = object(item); return {cliente_key: count(row.cliente_key), customer_id: id(row.customer_id),
     customer_name: text(row.customer_name), ventas_sin_impuestos: amount(row.ventas_sin_impuestos)};
 });
-export function apiBase(value: string) {
-  const url = new URL(value);
-  if (!['http:','https:'].includes(url.protocol) || url.username || url.password || url.search || url.hash)
-    throw new Error('Configura VITE_API_BASE_URL con una URL HTTP(S) sin credenciales.');
-  return url.href.replace(/\/$/,'');
-}
 export async function fetchApi<T>(path: string, parse: Parser<T>, signal: AbortSignal): Promise<T> {
-  const base = apiBase(import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000');
-  const response = await fetch(`${base}/api/v1${path}`, {signal, credentials:'omit', headers:{Accept:'application/json'}});
-  if (!response.ok) throw new Error('No se pudo consultar la API.');
-  return parse(await response.json());
+  return parse(await requestJson(`/api/v1${path}`, signal));
 }
