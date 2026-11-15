@@ -168,5 +168,45 @@ class RawQualityTests(unittest.TestCase):
         self.assertFalse((self.root / 'reports').exists())
 
 
+    def test_explicit_raw_directory_keeps_legacy_default(self):
+        self.prepare_run()
+        chosen = self.root / 'raw' / 'run-ficticio'
+        chosen.mkdir()
+        for table, filename, _ in raw.TABLES:
+            self.write_csv(chosen / filename, table, [self.row(table), self.row(table, **{next(c['name'] for c in self.metadata['tables'][table] if c['primary_key']): '2'})])
+        explicit, _ = raw.run_validation(self.root, raw_dir=chosen)
+        legacy, _ = raw.run_validation(self.root)
+        self.assertEqual(explicit['raw_dir'], str(chosen.resolve()))
+        self.assertEqual(sum(r['leidas'] for r in explicit['tablas'].values()), 10)
+        self.assertEqual(sum(r['leidas'] for r in legacy['tablas'].values()), 5)
+        self.assertEqual(raw.parse_args(['--raw-dir', str(chosen)]).raw_dir, chosen)
+        self.assertIsNone(raw.parse_args([]).raw_dir)
+
+    def test_failed_manifest_is_not_validated(self):
+        self.prepare_run()
+        (self.root / 'raw' / 'extraction_manifest.json').write_text(json.dumps({'estado': 'fallido'}), encoding='utf-8')
+        with self.assertRaisesRegex(ValueError, 'no está completada'):
+            raw.run_validation(self.root, raw_dir=self.root / 'raw')
+        self.assertFalse((self.root / 'reports').exists())
+
+    def test_completed_manifest_provenance_and_count_mismatch(self):
+        self.prepare_run()
+        manifest = {'estado': 'completado', 'modo': 'completo', 'run_id': 'ficticio',
+                    'tablas': {table: {'estado': 'completado', 'filas_extraidas': 1} for table, _, _ in raw.TABLES}}
+        path = self.root / 'raw' / 'extraction_manifest.json'
+        path.write_text(json.dumps(manifest), encoding='utf-8')
+        report, _ = raw.run_validation(self.root)
+        self.assertEqual(report['raw_run_id'], 'ficticio')
+        self.assertEqual(report['raw_modo'], 'completo')
+        manifest['tablas']['Sales.Orders']['filas_extraidas'] = 2
+        path.write_text(json.dumps(manifest), encoding='utf-8')
+        with self.assertRaisesRegex(ValueError, 'filas distintas'):
+            raw.run_validation(self.root)
+
+    def test_missing_selected_directory_does_not_fall_back(self):
+        self.prepare_run()
+        with self.assertRaisesRegex(ValueError, 'Falta CSV RAW'):
+            raw.run_validation(self.root, raw_dir=self.root / 'inexistente')
+
 if __name__ == '__main__':
     unittest.main()

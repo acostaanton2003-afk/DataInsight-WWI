@@ -72,3 +72,5 @@ La prueba de conexión usa autenticación integrada de Windows y pyodbc. Consult
 La [primera extracción RAW](documentation/06_extraccion_raw.md) guarda muestras de 100 filas por tabla en data/raw/ mediante lotes pequeños. Requiere Python 3.12 o superior. Los CSV locales están excluidos de Git.
 
 La [validación RAW → VALIDATED](documentation/07_validacion_calidad.md) separa registros válidos y cuarentena y genera un reporte de calidad local. Requiere Python 3.13 o superior; no aplica claves foráneas entre las muestras independientes.
+
+La [extracción completa](documentation/08_extraccion_completa.md) añade modos muestra/completo, lotes configurables (500 por defecto), conteos contra SQL Server y directorios RAW por ejecución. La muestra sigue siendo el modo predeterminado y el validador acepta --raw-dir.

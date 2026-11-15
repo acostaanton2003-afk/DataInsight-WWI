@@ -2,7 +2,7 @@
 
 ## Alcance y ejecución
 
-`etl/validar_raw.py` lee las cinco muestras de `data/raw/`, separa registros válidos y rechazados y genera un reporte JSON por ejecución. No modifica RAW, no conecta a SQL Server, no transforma valores ni implementa READY, staging, Supabase, Data Warehouse o incrementalidad. No añade dependencias: utiliza la biblioteca estándar de Python **3.13 o superior** y reutiliza la lista cerrada de tablas de `extraer_raw.py`.
+`etl/validar_raw.py` lee los cinco CSV del directorio indicado con `--raw-dir` (o las muestras legadas de `data/raw/` si se omite), separa registros válidos y rechazados y genera un reporte JSON por ejecución. No modifica RAW, no conecta a SQL Server, no transforma valores ni implementa READY, staging, Supabase, Data Warehouse o incrementalidad. No añade dependencias: utiliza la biblioteca estándar de Python **3.13 o superior** y reutiliza la lista cerrada de tablas de `extraer_raw.py`.
 
 Desde PowerShell en la raíz, con el entorno virtual existente:
 
@@ -16,6 +16,10 @@ $LASTEXITCODE
 ```
 
 Códigos del validador: **0** = ejecución completa sin rechazados; **2** = ejecución completa con rechazados; **1** = fallo operativo, de lectura o esquema, sin reporte de ejecución completa. Las advertencias no cambian el código 0 a 2. Las pruebas devuelven 0 cuando pasan.
+
+## Selección de una ejecución RAW
+
+Para validar una ejecución nueva usar `.\.venv\Scripts\python.exe .\etl\validar_raw.py --raw-dir '.\data\raw\<run_id>'`. Se conserva el modo sin argumentos para los CSV legados. El reporte registra directorio, run_id y modo de extracción; si hay manifiesto se exige estado completado y coincidencia con sus filas extraídas. Véase [extracción completa](08_extraccion_completa.md). Las claves foráneas permanecen desactivadas tanto para muestra como para completo hasta implementar comprobaciones seguras.
 
 ## Esquema real y reglas aplicadas
 

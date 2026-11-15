@@ -1,5 +1,6 @@
 """Validación local RAW -> VALIDATED/cuarentena; sin modificar RAW ni SQL Server."""
 
+import argparse
 import csv
 import hashlib
 import json
@@ -207,24 +208,41 @@ def load_schema():
     return metadata
 
 
-def run_validation(data_dir=ROOT / 'data'):
+def run_validation(data_dir=ROOT / 'data', raw_dir=None):
     csv.field_size_limit(FIELD_LIMIT)
     metadata = load_schema()
     data_dir = Path(data_dir).resolve()
+    source_dir = Path(raw_dir).resolve() if raw_dir is not None else data_dir / 'raw'
+    source_manifest = None
+    manifest_path = source_dir / 'extraction_manifest.json'
+    if manifest_path.exists():
+        with manifest_path.open(encoding='utf-8') as stream:
+            source_manifest = json.load(stream)
+        if source_manifest.get('estado') != 'completado':
+            raise ValueError('La ejecución RAW no está completada; no se valida')
+    # Sin manifiesto se admiten los CSV legados de data/raw/.
+    for table, filename, _ in TABLES:
+        if not (source_dir / filename).is_file():
+            raise ValueError(f'Falta CSV RAW en {source_dir}: {filename}')
+        if source_manifest is not None and source_manifest.get('tablas', {}).get(table, {}).get('estado') != 'completado':
+            raise ValueError(f'{table}: estado incompleto en manifiesto RAW')
     data_dir.mkdir(parents=True, exist_ok=True)
     run_id = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ') + '-' + uuid.uuid4().hex
     report = {'run_id': run_id, 'estado': 'completado', 'tolerancia_provisional': str(TOLERANCE),
               'fecha_evaluacion_local': datetime.now(LOCAL_TIMEZONE).date().isoformat(),
               'zona_horaria': 'America/Tegucigalpa (UTC-06:00)',
               'esquema_capturado_utc': metadata['captured_at_utc'],
-              'claves_foraneas': 'NO_EVALUADAS: muestras independientes; definidas en etl/esquema_raw.json', 'tablas': {}}
+              'raw_dir': str(source_dir),
+              'raw_run_id': source_manifest.get('run_id') if source_manifest else None,
+              'raw_modo': source_manifest.get('modo') if source_manifest else 'legado',
+              'claves_foraneas': 'NO_EVALUADAS: controles completos y seguros pendientes; definidas en etl/esquema_raw.json', 'tablas': {}}
     published = []
     with tempfile.TemporaryDirectory(prefix='.validacion-', dir=data_dir) as temporary:
         stage = Path(temporary)
         for area in ('snapshot', 'validated', 'quarantine'):
             (stage / area).mkdir()
         for table, filename, _ in TABLES:
-            original = data_dir / 'raw' / filename
+            original = source_dir / filename
             snapshot = stage / 'snapshot' / filename
             before = original.stat()
             shutil.copyfile(original, snapshot)
@@ -236,6 +254,8 @@ def run_validation(data_dir=ROOT / 'data'):
             result = validate_table(table, snapshot, metadata['tables'][table],
                                     stage / 'validated' / filename, stage / 'quarantine' / filename,
                                     stage / (table + '.sqlite'))
+            if source_manifest is not None and result['leidas'] != source_manifest['tablas'][table]['filas_extraidas']:
+                raise ValueError(f'{filename}: filas distintas del manifiesto RAW')
             result['raw_sha256'] = digest
             result['raw_file'] = str(original)
             result['validated_file'] = str(data_dir / 'validated' / run_id / filename)
@@ -264,12 +284,19 @@ def run_validation(data_dir=ROOT / 'data'):
     return report, destination
 
 
-def main():
+def parse_args(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--raw-dir', type=Path, default=None, help='Directorio con los cinco CSV; predeterminado data/raw/ legado.')
+    return parser.parse_args(argv)
+
+
+def main(argv=None):
+    args = parse_args(argv)
     if sys.version_info < (3, 13):
         print('ERROR: se requiere Python 3.13+ para leer NULL con QUOTE_NOTNULL.', file=sys.stderr)
         return 1
     try:
-        report, path = run_validation()
+        report, path = run_validation(raw_dir=args.raw_dir)
         for table, result in report['tablas'].items():
             print(f"{table}: leídas={result['leidas']}, válidas={result['validas']}, rechazadas={result['rechazadas']}, balance={result['balance_correcto']}")
             print(f"  Errores: {json.dumps(result['errores'], ensure_ascii=True)}")

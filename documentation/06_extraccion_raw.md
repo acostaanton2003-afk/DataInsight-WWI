@@ -2,19 +2,21 @@
 
 ## Alcance
 
+La extracción ahora admite modos muestra/completo y guarda cada ejecución en data/raw/<run_id>/. La [guía de extracción completa](08_extraccion_completa.md) documenta el comportamiento vigente y los comandos de ambos modos. Las muestras legadas en data/raw/ se conservan.
+
 `etl/extraer_raw.py` realiza cinco consultas de lectura y guarda una muestra técnica de hasta 100 filas por tabla. No aplica validaciones de calidad, transformaciones de negocio, staging, cargas a Supabase ni extracción incremental. No modifica la base.
 
 La conexión se reutiliza desde `etl/conexion_sqlserver.py`, compartida con `etl/probar_conexion_sqlserver.py`: pyodbc, autenticación integrada de Windows y variables de entorno. Se utiliza ODBC Driver 18 en los comandos siguientes; se conserva la selección automática 18/17 si la variable del controlador queda vacía. La única dependencia sigue siendo `pyodbc`, en `etl/requirements.txt`.
 
 | Tabla | Orden de la muestra | Archivo relativo a la raíz |
 | --- | --- | --- |
-| Sales.Invoices | InvoiceID | data/raw/Sales.Invoices.csv |
-| Sales.InvoiceLines | InvoiceLineID | data/raw/Sales.InvoiceLines.csv |
-| Sales.Customers | CustomerID | data/raw/Sales.Customers.csv |
-| Warehouse.StockItems | StockItemID | data/raw/Warehouse.StockItems.csv |
-| Sales.Orders | OrderID | data/raw/Sales.Orders.csv |
+| Sales.Invoices | InvoiceID | data/raw/<run_id>/Sales.Invoices.csv |
+| Sales.InvoiceLines | InvoiceLineID | data/raw/<run_id>/Sales.InvoiceLines.csv |
+| Sales.Customers | CustomerID | data/raw/<run_id>/Sales.Customers.csv |
+| Warehouse.StockItems | StockItemID | data/raw/<run_id>/Warehouse.StockItems.csv |
+| Sales.Orders | OrderID | data/raw/<run_id>/Sales.Orders.csv |
 
-Las consultas están escritas en una lista fija y usan `SELECT TOP (100) * ... ORDER BY <clave primaria>`. No hay argumentos para introducir tablas, claves ni SQL libre. Se conservan los nombres y el orden de columnas devueltos por el servidor.
+Las consultas de muestra están escritas en una lista fija y usan `SELECT TOP (100) * ... ORDER BY <clave primaria>`. No hay argumentos para introducir tablas, claves ni SQL libre. Se conservan los nombres y el orden de columnas devueltos por el servidor.
 
 ## Ejecución en PowerShell desde la raíz
 
@@ -64,11 +66,11 @@ CSV no almacena el esquema SQL ni los tipos. Para reconstruir tipos, binarios o 
 
 ## Memoria, errores y archivos finales
 
-Se procesa una tabla a la vez usando `fetchmany(25)`, sin `fetchall`, pandas ni cargar tablas completas en RAM. El límite inicial de 100 filas y los lotes pequeños son adecuados para una prueba en un equipo de 8 GB; campos binarios o textos grandes también influyen en la memoria usada. La conexión conserva 10 segundos de timeout y cada consulta 30 segundos.
+Se procesa una tabla a la vez usando `fetchmany(500)` por defecto (configurable con `--batch-size`), sin `fetchall`, pandas ni cargar tablas completas en RAM. El límite inicial de 100 filas y los lotes pequeños son adecuados para una prueba en un equipo de 8 GB; campos binarios o textos grandes también influyen en la memoria usada. La conexión conserva 10 segundos de timeout y cada consulta 30 segundos.
 
-Cada tabla se escribe en un temporal único dentro de `data/raw/`. Solo después de completar y cerrar el CSV se publica con `os.replace`. En una ejecución correcta se reemplaza la muestra anterior de esa tabla. Ante una excepción se elimina el temporal y se conserva el archivo final previo, si existía. Si Windows impide reemplazar un CSV abierto en otra aplicación, se informa del fallo y se conserva el anterior.
+Cada tabla se escribe en un temporal único dentro de `data/raw/<run_id>/`. Solo después de completar y cerrar el CSV se publica con `os.replace`. Cada ejecución usa un directorio nuevo y conserva las muestras anteriores. Ante una excepción se elimina el temporal y se conserva el archivo final previo, si existía. Si Windows impide reemplazar un CSV abierto en otra aplicación, se informa del fallo y se conserva el anterior.
 
-La consola informa tabla, filas y ruta absoluta por cada archivo publicado. Ante error se indica la tabla y ruta afectadas cuando corresponde, se detiene el proceso y se devuelve código 1. Una ejecución correcta devuelve 0. No se registra la cadena de conexión ni credenciales. No hay atomicidad conjunta entre las cinco tablas: si falla una, las anteriores pueden haberse actualizado y las posteriores conservar muestras anteriores. Una terminación forzada del proceso o del equipo puede dejar un `.tmp`, pero no publica ese archivo como CSV final.
+La consola informa tabla, filas y ruta absoluta por cada archivo publicado. Ante error se indica la tabla y ruta afectadas cuando corresponde, se detiene el proceso y se devuelve código 1. Una ejecución correcta devuelve 0. No se registra la cadena de conexión ni credenciales. No hay atomicidad conjunta entre las cinco tablas: si falla una, la ejecución queda marcada como fallida y no debe consumirse, aunque contenga archivos completos de tablas anteriores. Una terminación forzada del proceso o del equipo puede dejar un `.tmp`, pero no publica ese archivo como CSV final.
 
 ## Limitaciones y comprobación técnica
 
