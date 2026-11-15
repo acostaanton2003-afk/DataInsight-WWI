@@ -14,5 +14,9 @@ def client(monkeypatch):
     for name in ('HOST','PORT','NAME','USER','PASSWORD','SSLMODE'):
         monkeypatch.setenv('BACKEND_DB_'+name,'')
     from backend.app.main import create_app
-    with TestClient(create_app(Settings())) as test_client:
+    # Service contract tests bypass only authorization; security tests use a fresh app.
+    from backend.app.auth_dependencies import require_business_access
+    application = create_app(Settings())
+    application.dependency_overrides[require_business_access] = lambda: None
+    with TestClient(application) as test_client:
         yield test_client

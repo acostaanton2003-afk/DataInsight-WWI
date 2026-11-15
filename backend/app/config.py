@@ -8,6 +8,7 @@ from typing import Mapping
 from urllib.parse import urlsplit, urlunsplit
 
 from dotenv import dotenv_values
+from backend.app.auth_config import AuthSettings
 
 ROOT = Path(__file__).resolve().parents[2]
 ENV_FILE = ROOT / '.env'
@@ -98,6 +99,7 @@ class AssistantSettings:
 
 @dataclass(frozen=True)
 class Settings:
+    auth: AuthSettings = field(default_factory=AuthSettings)
     host: str = '127.0.0.1'
     port: int = 8000
     cors_origins: tuple[str,...] = DEFAULT_ORIGINS
@@ -131,7 +133,7 @@ def load_settings(env_file=ENV_FILE,environ: Mapping[str,str] | None=None):
         return get('BACKEND_DB_'+name,default) or default
     database = ReadOnlyDatabaseSettings(host=db('HOST'),port=db('PORT','5432'),name=db('NAME'),
                                        user=db('USER'),password=db('PASSWORD'),sslmode=db('SSLMODE','require'))
-    return Settings(host=get('BACKEND_HOST','127.0.0.1'),port=get('BACKEND_PORT','8000'),
+    return Settings(auth=AuthSettings(supabase_url=get('SUPABASE_AUTH_URL','')),host=get('BACKEND_HOST','127.0.0.1'),port=get('BACKEND_PORT','8000'),
                     cors_origins=parse_origins(get('CORS_ORIGINS',','.join(DEFAULT_ORIGINS))),database=database,
                     forecast_path=get('BACKEND_FORECAST_PATH','artifacts/machine_learning/published/resumen.json') or 'artifacts/machine_learning/published/resumen.json',
                     assistant=AssistantSettings(provider=get('ASSISTANT_PROVIDER','local'),model=get('ASSISTANT_OLLAMA_MODEL') or ('qwen3:1.7b' if get('ASSISTANT_PROVIDER','local')=='ollama' else ''),

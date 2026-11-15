@@ -102,3 +102,10 @@ El [asistente de análisis de negocio](documentation/20_asistente_ia.md) añade 
 La [integración local de Ollama/Qwen3](documentation/21_integracion_ollama.md) conecta el proveedor existente a qwen3:1.7b, reconoce variantes en español, oculta el razonamiento y muestra el proveedor/modelo efectivos. Se validaron los cinco temas con Ollama local real; reglas permanece como alternativa. Activar con ASSISTANT_PROVIDER=ollama y reiniciar FastAPI según los comandos de Windows documentados.
 
 El [orquestador ETL manual](documentation/22_orquestador_etl.md) encadena extracción completa, validación, READY y simulación DWH con rutas aisladas por ejecución, parada ante rechazos y bloqueo de concurrencia. Ejecutar desde la raíz: `.\.venv\Scripts\python.exe etl/ejecutar_pipeline.py --modo completo --dry-run`. No permite --execute ni escribe en Supabase.
+
+### Seguridad: autenticación Supabase Auth, Fase 1
+
+FastAPI valida sesiones ES256 con JWKS. Health es público; los endpoints de negocio
+responden 401 sin sesión y 403 con sesión válida hasta implementar permisos.
+El dashboard no tiene login todavía y recibirá 401.
+[Configuración, decisiones y pruebas](documentation/23_autenticacion_supabase_fase1.md).
