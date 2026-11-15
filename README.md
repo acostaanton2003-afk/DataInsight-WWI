@@ -6,7 +6,7 @@ Primer examen de Tecnologia Emergente.
 
 **DataInsight WWI — Plataforma Integral de Ingeniería de Datos y Analítica Inteligente** es un proyecto universitario que integra datos de WideWorldImporters, los transforma con Python y los organiza en un Data Warehouse en Supabase PostgreSQL. La plataforma ofrecerá consultas mediante una API, dashboards interactivos, modelos de Machine Learning, funciones de IA generativa y alertas automatizadas.
 
-La etapa ETL incluye la conexión de Python a SQL Server y una primera muestra de extracción a CSV RAW. Las transformaciones y cargas siguen pendientes.
+El Data Warehouse de ventas está cargado y conciliado, según el estado confirmado del proyecto. El backend inicia con FastAPI y un endpoint health sin conexión a datos; los endpoints de negocio y el frontend siguen pendientes.
 
 ## Tecnologías
 
@@ -50,7 +50,7 @@ El archivo `.env.example` contiene los nombres de las variables previstas y valo
 
 Las contraseñas, claves privadas y la clave de servicio de Supabase deben permanecer en procesos del lado del servidor. Las variables con prefijo `VITE_` son públicas y deben contener únicamente configuración apta para el navegador.
 
-Los nombres de las variables son una propuesta inicial y se conectarán al código durante la implementación de cada componente.
+Cada componente consume únicamente su configuración documentada. El backend usa BACKEND_HOST, BACKEND_PORT y CORS_ORIGINS; reserva BACKEND_DB_* para un futuro rol lector, sin reutilizar las credenciales administrativas del ETL.
 
 ## Fases de desarrollo
 
@@ -83,4 +83,6 @@ La [preparación del DDL físico en Supabase PostgreSQL 17](documentation/11_cre
 
 La [prueba segura de conexión a Supabase PostgreSQL](documentation/12_conexion_supabase.md) usa psycopg, SSL y las variables SUPABASE_DB_* del .env local. Solo consulta identidad, versión y existencia de las cinco tablas dwh; no modifica SQL Server ni implementa cargas READY → DWH.
 
-La [carga controlada READY → DWH](documentation/13_carga_dwh_supabase.md) incorpora prevalidación, dry-run predeterminado, transacción única y comparación idempotente sin borrar ni sobrescribir datos. El dry-run real pasó con las cinco tablas vacías; la ejecución de --execute queda pendiente de autorización expresa.
+La [carga controlada READY → DWH](documentation/13_carga_dwh_supabase.md) incorpora prevalidación, dry-run predeterminado, transacción única y comparación idempotente sin borrar ni sobrescribir datos. La documentación conserva la evidencia de su dry-run inicial; el estado actual informado del proyecto confirma las cinco tablas cargadas y conciliadas.
+
+El [backend inicial FastAPI](documentation/14_backend_fastapi.md) ofrece GET /api/v1/health, Swagger y CORS local configurable, con dependencias y pruebas separadas. Iniciar desde la raíz con `.\.venv\Scripts\python.exe -m backend` y abrir http://127.0.0.1:8000/docs. La API todavía no conecta PostgreSQL ni expone endpoints de negocio.
