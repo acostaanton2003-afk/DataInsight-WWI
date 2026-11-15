@@ -1,4 +1,4 @@
-﻿# Reglas de calidad de datos
+# Reglas de calidad de datos
 
 ## Estado y alcance
 
@@ -51,3 +51,7 @@ La **validación detallada de impuestos permanece pendiente**, incluida la compa
 La **conciliación completa de B.7 permanece pendiente**: comparar líneas originales, agregación por InvoiceID, enlaces a cabeceras y maestros, y sumas por cliente y mes sobre la misma población. La coincidencia entre el total mensual y el KPI 1 es evidencia parcial, no el cierre de esa sección. No se propone igualar todos los pedidos con todas las facturas, pues existen pedidos sin factura.
 
 Pendiente adjuntar fecha y salidas de ejecución, completar los rankings y los perfiles sin resultados comunicados, y aprobar moneda, política de créditos, unidades, tolerancia y excepciones antes del ETL. Si la fuente cambia, repetir los controles sobre un mismo estado. No se crean procesos ETL ni se aplican correcciones a la base en esta actualización.
+
+## Aplicación local sobre las muestras RAW
+
+La etapa [RAW → VALIDATED](07_validacion_calidad.md) implementa controles basados en los metadatos reales, cuarentena y reportes locales. Este registro de validaciones de la fuente conserva su alcance histórico: la muestra local no completa la conciliación SQL de la sección 7 ni la validación detallada de impuestos. Ceros, negativos y fechas futuras se perfilan sin inventar reglas de rechazo. Las claves foráneas no se evalúan entre muestras independientes.

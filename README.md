@@ -70,3 +70,5 @@ Desarrollar y ejecutar los componentes por etapas. Utilizar cargas ETL por lotes
 La prueba de conexión usa autenticación integrada de Windows y pyodbc. Consulta [instalación y ejecución en PowerShell](documentation/05_conexion_sqlserver.md). El script lee variables de entorno del proceso; no carga `.env` automáticamente. Esta etapa no implementa transformaciones ni cargas.
 
 La [primera extracción RAW](documentation/06_extraccion_raw.md) guarda muestras de 100 filas por tabla en data/raw/ mediante lotes pequeños. Requiere Python 3.12 o superior. Los CSV locales están excluidos de Git.
+
+La [validación RAW → VALIDATED](documentation/07_validacion_calidad.md) separa registros válidos y cuarentena y genera un reporte de calidad local. Requiere Python 3.13 o superior; no aplica claves foráneas entre las muestras independientes.

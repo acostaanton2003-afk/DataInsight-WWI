@@ -1,0 +1,1239 @@
+{
+  "source": "ANTON\\SQLEXPRESS/WideWorldImporters",
+  "captured_at_utc": "2026-11-15T04:35:44.291103+00:00",
+  "tables": {
+    "Sales.Invoices": [
+      {
+        "name": "InvoiceID",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 1
+      },
+      {
+        "name": "CustomerID",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "BillToCustomerID",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "OrderID",
+        "type": "int",
+        "nullable": true,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "DeliveryMethodID",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "ContactPersonID",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "AccountsPersonID",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "SalespersonPersonID",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "PackedByPersonID",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "InvoiceDate",
+        "type": "date",
+        "nullable": false,
+        "max_length": 3,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "CustomerPurchaseOrderNumber",
+        "type": "nvarchar",
+        "nullable": true,
+        "max_length": 40,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "IsCreditNote",
+        "type": "bit",
+        "nullable": false,
+        "max_length": 1,
+        "precision": 1,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "CreditNoteReason",
+        "type": "nvarchar",
+        "nullable": true,
+        "max_length": -1,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "Comments",
+        "type": "nvarchar",
+        "nullable": true,
+        "max_length": -1,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "DeliveryInstructions",
+        "type": "nvarchar",
+        "nullable": true,
+        "max_length": -1,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "InternalComments",
+        "type": "nvarchar",
+        "nullable": true,
+        "max_length": -1,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "TotalDryItems",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "TotalChillerItems",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "DeliveryRun",
+        "type": "nvarchar",
+        "nullable": true,
+        "max_length": 10,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "RunPosition",
+        "type": "nvarchar",
+        "nullable": true,
+        "max_length": 10,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "ReturnedDeliveryData",
+        "type": "nvarchar",
+        "nullable": true,
+        "max_length": -1,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "ConfirmedDeliveryTime",
+        "type": "datetime2",
+        "nullable": true,
+        "max_length": 8,
+        "precision": 27,
+        "scale": 7,
+        "primary_key": 0
+      },
+      {
+        "name": "ConfirmedReceivedBy",
+        "type": "nvarchar",
+        "nullable": true,
+        "max_length": 8000,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "LastEditedBy",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "LastEditedWhen",
+        "type": "datetime2",
+        "nullable": false,
+        "max_length": 8,
+        "precision": 27,
+        "scale": 7,
+        "primary_key": 0
+      }
+    ],
+    "Sales.InvoiceLines": [
+      {
+        "name": "InvoiceLineID",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 1
+      },
+      {
+        "name": "InvoiceID",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "StockItemID",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "Description",
+        "type": "nvarchar",
+        "nullable": false,
+        "max_length": 200,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "PackageTypeID",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "Quantity",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "UnitPrice",
+        "type": "decimal",
+        "nullable": true,
+        "max_length": 9,
+        "precision": 18,
+        "scale": 2,
+        "primary_key": 0
+      },
+      {
+        "name": "TaxRate",
+        "type": "decimal",
+        "nullable": false,
+        "max_length": 9,
+        "precision": 18,
+        "scale": 3,
+        "primary_key": 0
+      },
+      {
+        "name": "TaxAmount",
+        "type": "decimal",
+        "nullable": false,
+        "max_length": 9,
+        "precision": 18,
+        "scale": 2,
+        "primary_key": 0
+      },
+      {
+        "name": "LineProfit",
+        "type": "decimal",
+        "nullable": false,
+        "max_length": 9,
+        "precision": 18,
+        "scale": 2,
+        "primary_key": 0
+      },
+      {
+        "name": "ExtendedPrice",
+        "type": "decimal",
+        "nullable": false,
+        "max_length": 9,
+        "precision": 18,
+        "scale": 2,
+        "primary_key": 0
+      },
+      {
+        "name": "LastEditedBy",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "LastEditedWhen",
+        "type": "datetime2",
+        "nullable": false,
+        "max_length": 8,
+        "precision": 27,
+        "scale": 7,
+        "primary_key": 0
+      }
+    ],
+    "Sales.Customers": [
+      {
+        "name": "CustomerID",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 1
+      },
+      {
+        "name": "CustomerName",
+        "type": "nvarchar",
+        "nullable": false,
+        "max_length": 200,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "BillToCustomerID",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "CustomerCategoryID",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "BuyingGroupID",
+        "type": "int",
+        "nullable": true,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "PrimaryContactPersonID",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "AlternateContactPersonID",
+        "type": "int",
+        "nullable": true,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "DeliveryMethodID",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "DeliveryCityID",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "PostalCityID",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "CreditLimit",
+        "type": "decimal",
+        "nullable": true,
+        "max_length": 9,
+        "precision": 18,
+        "scale": 2,
+        "primary_key": 0
+      },
+      {
+        "name": "AccountOpenedDate",
+        "type": "date",
+        "nullable": false,
+        "max_length": 3,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "StandardDiscountPercentage",
+        "type": "decimal",
+        "nullable": false,
+        "max_length": 9,
+        "precision": 18,
+        "scale": 3,
+        "primary_key": 0
+      },
+      {
+        "name": "IsStatementSent",
+        "type": "bit",
+        "nullable": false,
+        "max_length": 1,
+        "precision": 1,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "IsOnCreditHold",
+        "type": "bit",
+        "nullable": false,
+        "max_length": 1,
+        "precision": 1,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "PaymentDays",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "PhoneNumber",
+        "type": "nvarchar",
+        "nullable": false,
+        "max_length": 40,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "FaxNumber",
+        "type": "nvarchar",
+        "nullable": false,
+        "max_length": 40,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "DeliveryRun",
+        "type": "nvarchar",
+        "nullable": true,
+        "max_length": 10,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "RunPosition",
+        "type": "nvarchar",
+        "nullable": true,
+        "max_length": 10,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "WebsiteURL",
+        "type": "nvarchar",
+        "nullable": false,
+        "max_length": 512,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "DeliveryAddressLine1",
+        "type": "nvarchar",
+        "nullable": false,
+        "max_length": 120,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "DeliveryAddressLine2",
+        "type": "nvarchar",
+        "nullable": true,
+        "max_length": 120,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "DeliveryPostalCode",
+        "type": "nvarchar",
+        "nullable": false,
+        "max_length": 20,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "DeliveryLocation",
+        "type": "geography",
+        "nullable": true,
+        "max_length": -1,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "PostalAddressLine1",
+        "type": "nvarchar",
+        "nullable": false,
+        "max_length": 120,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "PostalAddressLine2",
+        "type": "nvarchar",
+        "nullable": true,
+        "max_length": 120,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "PostalPostalCode",
+        "type": "nvarchar",
+        "nullable": false,
+        "max_length": 20,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "LastEditedBy",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "ValidFrom",
+        "type": "datetime2",
+        "nullable": false,
+        "max_length": 8,
+        "precision": 27,
+        "scale": 7,
+        "primary_key": 0
+      },
+      {
+        "name": "ValidTo",
+        "type": "datetime2",
+        "nullable": false,
+        "max_length": 8,
+        "precision": 27,
+        "scale": 7,
+        "primary_key": 0
+      }
+    ],
+    "Warehouse.StockItems": [
+      {
+        "name": "StockItemID",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 1
+      },
+      {
+        "name": "StockItemName",
+        "type": "nvarchar",
+        "nullable": false,
+        "max_length": 200,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "SupplierID",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "ColorID",
+        "type": "int",
+        "nullable": true,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "UnitPackageID",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "OuterPackageID",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "Brand",
+        "type": "nvarchar",
+        "nullable": true,
+        "max_length": 100,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "Size",
+        "type": "nvarchar",
+        "nullable": true,
+        "max_length": 40,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "LeadTimeDays",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "QuantityPerOuter",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "IsChillerStock",
+        "type": "bit",
+        "nullable": false,
+        "max_length": 1,
+        "precision": 1,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "Barcode",
+        "type": "nvarchar",
+        "nullable": true,
+        "max_length": 100,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "TaxRate",
+        "type": "decimal",
+        "nullable": false,
+        "max_length": 9,
+        "precision": 18,
+        "scale": 3,
+        "primary_key": 0
+      },
+      {
+        "name": "UnitPrice",
+        "type": "decimal",
+        "nullable": false,
+        "max_length": 9,
+        "precision": 18,
+        "scale": 2,
+        "primary_key": 0
+      },
+      {
+        "name": "RecommendedRetailPrice",
+        "type": "decimal",
+        "nullable": true,
+        "max_length": 9,
+        "precision": 18,
+        "scale": 2,
+        "primary_key": 0
+      },
+      {
+        "name": "TypicalWeightPerUnit",
+        "type": "decimal",
+        "nullable": false,
+        "max_length": 9,
+        "precision": 18,
+        "scale": 3,
+        "primary_key": 0
+      },
+      {
+        "name": "MarketingComments",
+        "type": "nvarchar",
+        "nullable": true,
+        "max_length": -1,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "InternalComments",
+        "type": "nvarchar",
+        "nullable": true,
+        "max_length": -1,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "Photo",
+        "type": "varbinary",
+        "nullable": true,
+        "max_length": -1,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "CustomFields",
+        "type": "nvarchar",
+        "nullable": true,
+        "max_length": -1,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "Tags",
+        "type": "nvarchar",
+        "nullable": true,
+        "max_length": -1,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "SearchDetails",
+        "type": "nvarchar",
+        "nullable": false,
+        "max_length": -1,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "LastEditedBy",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "ValidFrom",
+        "type": "datetime2",
+        "nullable": false,
+        "max_length": 8,
+        "precision": 27,
+        "scale": 7,
+        "primary_key": 0
+      },
+      {
+        "name": "ValidTo",
+        "type": "datetime2",
+        "nullable": false,
+        "max_length": 8,
+        "precision": 27,
+        "scale": 7,
+        "primary_key": 0
+      }
+    ],
+    "Sales.Orders": [
+      {
+        "name": "OrderID",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 1
+      },
+      {
+        "name": "CustomerID",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "SalespersonPersonID",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "PickedByPersonID",
+        "type": "int",
+        "nullable": true,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "ContactPersonID",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "BackorderOrderID",
+        "type": "int",
+        "nullable": true,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "OrderDate",
+        "type": "date",
+        "nullable": false,
+        "max_length": 3,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "ExpectedDeliveryDate",
+        "type": "date",
+        "nullable": false,
+        "max_length": 3,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "CustomerPurchaseOrderNumber",
+        "type": "nvarchar",
+        "nullable": true,
+        "max_length": 40,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "IsUndersupplyBackordered",
+        "type": "bit",
+        "nullable": false,
+        "max_length": 1,
+        "precision": 1,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "Comments",
+        "type": "nvarchar",
+        "nullable": true,
+        "max_length": -1,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "DeliveryInstructions",
+        "type": "nvarchar",
+        "nullable": true,
+        "max_length": -1,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "InternalComments",
+        "type": "nvarchar",
+        "nullable": true,
+        "max_length": -1,
+        "precision": 0,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "PickingCompletedWhen",
+        "type": "datetime2",
+        "nullable": true,
+        "max_length": 8,
+        "precision": 27,
+        "scale": 7,
+        "primary_key": 0
+      },
+      {
+        "name": "LastEditedBy",
+        "type": "int",
+        "nullable": false,
+        "max_length": 4,
+        "precision": 10,
+        "scale": 0,
+        "primary_key": 0
+      },
+      {
+        "name": "LastEditedWhen",
+        "type": "datetime2",
+        "nullable": false,
+        "max_length": 8,
+        "precision": 27,
+        "scale": 7,
+        "primary_key": 0
+      }
+    ]
+  },
+  "foreign_keys_pending": [
+    {
+      "constraint": "FK_Sales_Invoices_AccountsPersonID_Application_People",
+      "column": "AccountsPersonID",
+      "parent_table": "Application.People",
+      "parent_column": "PersonID",
+      "table": "Sales.Invoices"
+    },
+    {
+      "constraint": "FK_Sales_Invoices_Application_People",
+      "column": "LastEditedBy",
+      "parent_table": "Application.People",
+      "parent_column": "PersonID",
+      "table": "Sales.Invoices"
+    },
+    {
+      "constraint": "FK_Sales_Invoices_BillToCustomerID_Sales_Customers",
+      "column": "BillToCustomerID",
+      "parent_table": "Sales.Customers",
+      "parent_column": "CustomerID",
+      "table": "Sales.Invoices"
+    },
+    {
+      "constraint": "FK_Sales_Invoices_ContactPersonID_Application_People",
+      "column": "ContactPersonID",
+      "parent_table": "Application.People",
+      "parent_column": "PersonID",
+      "table": "Sales.Invoices"
+    },
+    {
+      "constraint": "FK_Sales_Invoices_CustomerID_Sales_Customers",
+      "column": "CustomerID",
+      "parent_table": "Sales.Customers",
+      "parent_column": "CustomerID",
+      "table": "Sales.Invoices"
+    },
+    {
+      "constraint": "FK_Sales_Invoices_DeliveryMethodID_Application_DeliveryMethods",
+      "column": "DeliveryMethodID",
+      "parent_table": "Application.DeliveryMethods",
+      "parent_column": "DeliveryMethodID",
+      "table": "Sales.Invoices"
+    },
+    {
+      "constraint": "FK_Sales_Invoices_OrderID_Sales_Orders",
+      "column": "OrderID",
+      "parent_table": "Sales.Orders",
+      "parent_column": "OrderID",
+      "table": "Sales.Invoices"
+    },
+    {
+      "constraint": "FK_Sales_Invoices_PackedByPersonID_Application_People",
+      "column": "PackedByPersonID",
+      "parent_table": "Application.People",
+      "parent_column": "PersonID",
+      "table": "Sales.Invoices"
+    },
+    {
+      "constraint": "FK_Sales_Invoices_SalespersonPersonID_Application_People",
+      "column": "SalespersonPersonID",
+      "parent_table": "Application.People",
+      "parent_column": "PersonID",
+      "table": "Sales.Invoices"
+    },
+    {
+      "constraint": "FK_Sales_InvoiceLines_Application_People",
+      "column": "LastEditedBy",
+      "parent_table": "Application.People",
+      "parent_column": "PersonID",
+      "table": "Sales.InvoiceLines"
+    },
+    {
+      "constraint": "FK_Sales_InvoiceLines_InvoiceID_Sales_Invoices",
+      "column": "InvoiceID",
+      "parent_table": "Sales.Invoices",
+      "parent_column": "InvoiceID",
+      "table": "Sales.InvoiceLines"
+    },
+    {
+      "constraint": "FK_Sales_InvoiceLines_PackageTypeID_Warehouse_PackageTypes",
+      "column": "PackageTypeID",
+      "parent_table": "Warehouse.PackageTypes",
+      "parent_column": "PackageTypeID",
+      "table": "Sales.InvoiceLines"
+    },
+    {
+      "constraint": "FK_Sales_InvoiceLines_StockItemID_Warehouse_StockItems",
+      "column": "StockItemID",
+      "parent_table": "Warehouse.StockItems",
+      "parent_column": "StockItemID",
+      "table": "Sales.InvoiceLines"
+    },
+    {
+      "constraint": "FK_Sales_Customers_AlternateContactPersonID_Application_People",
+      "column": "AlternateContactPersonID",
+      "parent_table": "Application.People",
+      "parent_column": "PersonID",
+      "table": "Sales.Customers"
+    },
+    {
+      "constraint": "FK_Sales_Customers_Application_People",
+      "column": "LastEditedBy",
+      "parent_table": "Application.People",
+      "parent_column": "PersonID",
+      "table": "Sales.Customers"
+    },
+    {
+      "constraint": "FK_Sales_Customers_BillToCustomerID_Sales_Customers",
+      "column": "BillToCustomerID",
+      "parent_table": "Sales.Customers",
+      "parent_column": "CustomerID",
+      "table": "Sales.Customers"
+    },
+    {
+      "constraint": "FK_Sales_Customers_BuyingGroupID_Sales_BuyingGroups",
+      "column": "BuyingGroupID",
+      "parent_table": "Sales.BuyingGroups",
+      "parent_column": "BuyingGroupID",
+      "table": "Sales.Customers"
+    },
+    {
+      "constraint": "FK_Sales_Customers_CustomerCategoryID_Sales_CustomerCategories",
+      "column": "CustomerCategoryID",
+      "parent_table": "Sales.CustomerCategories",
+      "parent_column": "CustomerCategoryID",
+      "table": "Sales.Customers"
+    },
+    {
+      "constraint": "FK_Sales_Customers_DeliveryCityID_Application_Cities",
+      "column": "DeliveryCityID",
+      "parent_table": "Application.Cities",
+      "parent_column": "CityID",
+      "table": "Sales.Customers"
+    },
+    {
+      "constraint": "FK_Sales_Customers_DeliveryMethodID_Application_DeliveryMethods",
+      "column": "DeliveryMethodID",
+      "parent_table": "Application.DeliveryMethods",
+      "parent_column": "DeliveryMethodID",
+      "table": "Sales.Customers"
+    },
+    {
+      "constraint": "FK_Sales_Customers_PostalCityID_Application_Cities",
+      "column": "PostalCityID",
+      "parent_table": "Application.Cities",
+      "parent_column": "CityID",
+      "table": "Sales.Customers"
+    },
+    {
+      "constraint": "FK_Sales_Customers_PrimaryContactPersonID_Application_People",
+      "column": "PrimaryContactPersonID",
+      "parent_table": "Application.People",
+      "parent_column": "PersonID",
+      "table": "Sales.Customers"
+    },
+    {
+      "constraint": "FK_Warehouse_StockItems_Application_People",
+      "column": "LastEditedBy",
+      "parent_table": "Application.People",
+      "parent_column": "PersonID",
+      "table": "Warehouse.StockItems"
+    },
+    {
+      "constraint": "FK_Warehouse_StockItems_ColorID_Warehouse_Colors",
+      "column": "ColorID",
+      "parent_table": "Warehouse.Colors",
+      "parent_column": "ColorID",
+      "table": "Warehouse.StockItems"
+    },
+    {
+      "constraint": "FK_Warehouse_StockItems_OuterPackageID_Warehouse_PackageTypes",
+      "column": "OuterPackageID",
+      "parent_table": "Warehouse.PackageTypes",
+      "parent_column": "PackageTypeID",
+      "table": "Warehouse.StockItems"
+    },
+    {
+      "constraint": "FK_Warehouse_StockItems_SupplierID_Purchasing_Suppliers",
+      "column": "SupplierID",
+      "parent_table": "Purchasing.Suppliers",
+      "parent_column": "SupplierID",
+      "table": "Warehouse.StockItems"
+    },
+    {
+      "constraint": "FK_Warehouse_StockItems_UnitPackageID_Warehouse_PackageTypes",
+      "column": "UnitPackageID",
+      "parent_table": "Warehouse.PackageTypes",
+      "parent_column": "PackageTypeID",
+      "table": "Warehouse.StockItems"
+    },
+    {
+      "constraint": "FK_Sales_Orders_Application_People",
+      "column": "LastEditedBy",
+      "parent_table": "Application.People",
+      "parent_column": "PersonID",
+      "table": "Sales.Orders"
+    },
+    {
+      "constraint": "FK_Sales_Orders_BackorderOrderID_Sales_Orders",
+      "column": "BackorderOrderID",
+      "parent_table": "Sales.Orders",
+      "parent_column": "OrderID",
+      "table": "Sales.Orders"
+    },
+    {
+      "constraint": "FK_Sales_Orders_ContactPersonID_Application_People",
+      "column": "ContactPersonID",
+      "parent_table": "Application.People",
+      "parent_column": "PersonID",
+      "table": "Sales.Orders"
+    },
+    {
+      "constraint": "FK_Sales_Orders_CustomerID_Sales_Customers",
+      "column": "CustomerID",
+      "parent_table": "Sales.Customers",
+      "parent_column": "CustomerID",
+      "table": "Sales.Orders"
+    },
+    {
+      "constraint": "FK_Sales_Orders_PickedByPersonID_Application_People",
+      "column": "PickedByPersonID",
+      "parent_table": "Application.People",
+      "parent_column": "PersonID",
+      "table": "Sales.Orders"
+    },
+    {
+      "constraint": "FK_Sales_Orders_SalespersonPersonID_Application_People",
+      "column": "SalespersonPersonID",
+      "parent_table": "Application.People",
+      "parent_column": "PersonID",
+      "table": "Sales.Orders"
+    }
+  ]
+}

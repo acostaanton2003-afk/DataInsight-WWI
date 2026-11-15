@@ -64,5 +64,5 @@ Desktop.ini
 
 # Datos locales y exportaciones potencialmente pesadas
 /data/
-# Incluye data/raw/*.csv y temporales; scripts y documentación se versionan.
+# Incluye raw/, validated/, quarantine/, reports/ y temporales de ejecución; código y documentación se versionan.
 /artifacts/
