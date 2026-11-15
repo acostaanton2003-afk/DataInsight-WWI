@@ -86,3 +86,5 @@ La [prueba segura de conexión a Supabase PostgreSQL](documentation/12_conexion_
 La [carga controlada READY → DWH](documentation/13_carga_dwh_supabase.md) incorpora prevalidación, dry-run predeterminado, transacción única y comparación idempotente sin borrar ni sobrescribir datos. La documentación conserva la evidencia de su dry-run inicial; el estado actual informado del proyecto confirma las cinco tablas cargadas y conciliadas.
 
 El [backend inicial FastAPI](documentation/14_backend_fastapi.md) ofrece GET /api/v1/health, Swagger y CORS local configurable, con dependencias y pruebas separadas. Iniciar desde la raíz con `.\.venv\Scripts\python.exe -m backend` y abrir http://127.0.0.1:8000/docs. La API todavía no conecta PostgreSQL ni expone endpoints de negocio.
+
+La [conexion lectora del backend al DWH](documentation/15_conexion_backend_dwh.md) incorpora psycopg y verificacion de visibilidad RLS. Los scripts de rol y la propuesta de politicas quedan para revisi?n y autorizacion manual; no se ejecutan al iniciar FastAPI.

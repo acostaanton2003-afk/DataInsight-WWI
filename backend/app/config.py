@@ -52,7 +52,7 @@ def port_number(value):
 
 @dataclass(frozen=True)
 class ReadOnlyDatabaseSettings:
-    """Reserva para un rol lector futuro. No hay driver, conexión ni pool."""
+    """Configuracion exclusiva del rol lector, sin conexiones al importar."""
     host: str = field(default='',repr=False)
     port: int = field(default=5432,repr=False)
     name: str = field(default='',repr=False)
@@ -60,6 +60,12 @@ class ReadOnlyDatabaseSettings:
     password: str = field(default='',repr=False)
     sslmode: str = field(default='require',repr=False)
     read_only: bool = field(default=True,init=False)
+
+    def validate_for_connection(self):
+        if not all(value.strip() for value in (self.host,self.name,self.user,self.password)):
+            raise ValueError('Falta configuracion BACKEND_DB_* para el rol lector.')
+        if self.user.split('.',1)[0] != 'wwi_backend_reader':
+            raise ValueError('La conexion requiere el rol exclusivo wwi_backend_reader.')
 
     def __post_init__(self):
         object.__setattr__(self,'port',port_number(self.port))
