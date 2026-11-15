@@ -1,120 +1,6 @@
 ﻿/*
-DataInsight WWI - Validaciones de KPI y calidad (solo lectura).
-BLOQUE A: variantes optimizadas para SQL Server Express.
-Los resultados de ejecuciones previas fueron comunicados por el usuario;
-no se ejecutó SQL contra la base durante esta actualización del repositorio.
-Rango observado: 2013-01-01 a 2016-05-31; consultas sin filtro temporal.
-LOOP JOIN y OPTION (MAXDOP 1) se usaron en JOIN problemáticos por memoria.
-Ejecutar cada consulta seleccionada en WideWorldImporters, tras revisar B.0.
-BLOQUE B conserva las comprobaciones originales como referencia, no como
-un lote obligatorio. Conciliación completa B.7 e impuestos detallados B.4:
-PENDIENTES. No interpretar las hipótesis originales como controles aprobados.
-SUM omite NULL; conservar B.1 para perfilar datos incompletos.
-*/
-
--- A.1 Ventas: 228265 líneas; 172261341.20 base; 25782098.25 impuestos;
--- 198043439.45 con impuestos. IsCreditNote = 0 en toda la población observada.
-SELECT COUNT_BIG(*) AS lineas,
-    SUM(CAST(l.Quantity AS decimal(12,0)) * CAST(l.UnitPrice AS decimal(19,4))) AS ventas_sin_impuestos,
-    SUM(CAST(l.TaxAmount AS decimal(28,4))) AS impuestos,
-    SUM(CAST(l.ExtendedPrice AS decimal(28,4))) AS ventas_con_impuestos
-FROM Sales.InvoiceLines AS l
-INNER LOOP JOIN Sales.Invoices AS i ON i.InvoiceID = l.InvoiceID
-WHERE i.IsCreditNote = 0
-OPTION (MAXDOP 1);
-
--- A.2 Facturas: 70510, todas con IsCreditNote = 0.
-SELECT IsCreditNote, COUNT_BIG(*) AS facturas,
-    MIN(InvoiceDate) AS primera_fecha, MAX(InvoiceDate) AS ultima_fecha
-FROM Sales.Invoices
-GROUP BY IsCreditNote
-OPTION (MAXDOP 1);
-
--- A.3 Top 10 por artículo y presentación; no mezclar PackageTypeID.
--- Líder comunicado: StockItemID 191, 207324 unidades.
--- No se proporcionaron PackageTypeID del líder ni las otras nueve filas.
-SELECT TOP (10) l.StockItemID, s.StockItemName, l.PackageTypeID,
-    SUM(CAST(l.Quantity AS bigint)) AS cantidad_facturada
-FROM Sales.InvoiceLines AS l
-INNER LOOP JOIN Sales.Invoices AS i ON i.InvoiceID = l.InvoiceID
-LEFT LOOP JOIN Warehouse.StockItems AS s ON s.StockItemID = l.StockItemID
-WHERE i.IsCreditNote = 0
-GROUP BY l.StockItemID, s.StockItemName, l.PackageTypeID
-ORDER BY cantidad_facturada DESC, l.StockItemID, l.PackageTypeID
-OPTION (MAXDOP 1);
-
--- A.4 Top 10 clientes: CustomerID 149 encabeza con 381585.35 sin impuestos.
--- Otras nueve filas no proporcionadas. Cliente comercial, no BillToCustomerID.
-SELECT TOP (10) i.CustomerID, c.CustomerName,
-    SUM(CAST(l.Quantity AS decimal(12,0)) * CAST(l.UnitPrice AS decimal(19,4))) AS ventas_sin_impuestos
-FROM Sales.InvoiceLines AS l
-INNER LOOP JOIN Sales.Invoices AS i ON i.InvoiceID = l.InvoiceID
-LEFT LOOP JOIN Sales.Customers AS c ON c.CustomerID = i.CustomerID
-WHERE i.IsCreditNote = 0
-GROUP BY i.CustomerID, c.CustomerName
-ORDER BY ventas_sin_impuestos DESC, i.CustomerID
-OPTION (MAXDOP 1);
-
--- A.5 Ventas mensuales: 41 meses, enero 2013 a mayo 2016;
--- suma comunicada 172261341.20. No completa la conciliación B.7.
-SELECT YEAR(i.InvoiceDate) AS anio, MONTH(i.InvoiceDate) AS mes,
-    SUM(CAST(l.Quantity AS decimal(12,0)) * CAST(l.UnitPrice AS decimal(19,4))) AS ventas_sin_impuestos
-FROM Sales.InvoiceLines AS l
-INNER LOOP JOIN Sales.Invoices AS i ON i.InvoiceID = l.InvoiceID
-WHERE i.IsCreditNote = 0
-GROUP BY YEAR(i.InvoiceDate), MONTH(i.InvoiceDate)
-ORDER BY anio, mes
-OPTION (MAXDOP 1);
-
--- A.6 Una fila por pedido; EXISTS evita multiplicación por facturas.
--- 73595 pedidos, 70510 con factura, 3085 sin factura, 4.19% sin factura.
-;WITH pedidos AS (
-    SELECT o.OrderID,
-        CASE WHEN EXISTS (SELECT 1 FROM Sales.Invoices AS i WHERE i.OrderID = o.OrderID)
-            THEN 0 ELSE 1 END AS sin_factura
-    FROM Sales.Orders AS o
-)
-SELECT COUNT_BIG(*) AS total_pedidos,
-    COUNT_BIG(CASE WHEN sin_factura = 0 THEN 1 END) AS pedidos_con_factura,
-    COUNT_BIG(CASE WHEN sin_factura = 1 THEN 1 END) AS pedidos_sin_factura,
-    CAST(100.0 * COUNT_BIG(CASE WHEN sin_factura = 1 THEN 1 END)
-        / NULLIF(COUNT_BIG(*), 0) AS decimal(5,2)) AS porcentaje_sin_factura
-FROM pedidos
-OPTION (LOOP JOIN, MAXDOP 1);
-
--- A.7 Coherencia monetaria: no se detectaron diferencias > 0.01
--- en las comprobaciones realizadas. No valida TaxRate ni igualdad exacta.
-SELECT COUNT_BIG(*) AS lineas,
-    COUNT_BIG(CASE WHEN Quantity IS NULL OR UnitPrice IS NULL
-        OR TaxAmount IS NULL OR ExtendedPrice IS NULL THEN 1 END) AS lineas_incompletas,
-    COUNT_BIG(CASE WHEN ABS(CAST(ExtendedPrice AS decimal(32,4))
-        - CAST(Quantity AS decimal(12,0)) * CAST(UnitPrice AS decimal(19,4))
-        - TaxAmount) > 0.01 THEN 1 END) AS diferencias_mayores_001
-FROM Sales.InvoiceLines
-OPTION (MAXDOP 1);
-
--- A.8 Rango observado: 2013-01-01 a 2016-05-31.
-SELECT N'Orders' AS tabla, MIN(OrderDate) AS primera_fecha, MAX(OrderDate) AS ultima_fecha
-FROM Sales.Orders
-UNION ALL
-SELECT N'Invoices', MIN(InvoiceDate), MAX(InvoiceDate)
-FROM Sales.Invoices
-OPTION (MAXDOP 1);
-
--- Cero facturas con fecha anterior al pedido en la comprobación realizada.
-SELECT COUNT_BIG(*) AS facturas_con_fecha_anterior_al_pedido
-FROM Sales.Invoices AS i
-INNER LOOP JOIN Sales.Orders AS o ON o.OrderID = i.OrderID
-WHERE i.InvoiceDate < o.OrderDate
-OPTION (MAXDOP 1);
-
--- Duplicados y relaciones huérfanas: no detectados en comprobaciones realizadas.
--- Se conservan los controles originales de B.1 y B.2 para su reproducción.
--- Impuestos detallados B.4 y conciliación completa B.7: PENDIENTES.
-GO
-/*
-BLOQUE B - Comprobaciones originales de referencia (secciones 0 a 7).
-Resultados comunicados en el bloque A y en documentation/03 y 04. No todos los controles tienen resultado.
+DataInsight WWI - Validación propuesta de KPI y calidad.
+Estado de todos los resultados nuevos: PENDIENTE DE EJECUCIÓN EN SSMS.
 Seleccionar WideWorldImporters en SSMS. Ejecutar sección 0 primero.
 Confirmar las columnas y tipos antes de ejecutar las otras secciones.
 Solo lectura. Cada CTE forma parte de su SELECT y debe ejecutarse completa.
@@ -491,7 +377,7 @@ FROM Sales.Orders AS o
 WHERE NOT EXISTS (SELECT 1 FROM Sales.Invoices AS i WHERE i.OrderID = o.OrderID)
 ORDER BY o.OrderDate, o.OrderID;
 
--- 7. Conciliación completa: PENDIENTE. Misma población y signos almacenados.
+-- 7. Conciliación. Misma población y signos almacenados.
 -- Comparar filas y sumas entre etapas. Cambios revelan pérdida o multiplicación.
 -- Los LEFT JOIN a maestros conservan referencias sin coincidencia.
 ;WITH por_factura AS (
@@ -553,4 +439,3 @@ FROM por_cliente
 UNION ALL
 SELECT N'Suma por mes', SUM(lineas), SUM(importe_base), SUM(base_alternativa), SUM(impuesto), SUM(extendido)
 FROM por_mes;
-
