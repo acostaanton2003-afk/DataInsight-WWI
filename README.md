@@ -80,3 +80,7 @@ El [modelo dimensional de ventas](documentation/09_modelo_dimensional.md) define
 La [transformación local VALIDATED → READY](documentation/10_transformacion_ready.md) prepara las tres dimensiones y los hechos de ventas/pedidos con claves reproducibles, referencias completas y conciliación por cliente/mes. Guarda ejecuciones independientes en data/ready/; no conecta Supabase ni carga el DWH físico.
 
 La [preparación del DDL físico en Supabase PostgreSQL 17](documentation/11_creacion_dwh_supabase.md) entrega la creación inicial de las cinco tablas dwh, restricciones, índices, revocaciones y consultas de inspección. Las cuatro claves técnicas son BIGINT explícitas sin IDENTITY ni secuencias; se mantienen las dos columnas calculadas. Se verificó localmente el contrato con READY; el DDL no se ha ejecutado y no se han cargado datos desde esta etapa.
+
+La [prueba segura de conexión a Supabase PostgreSQL](documentation/12_conexion_supabase.md) usa psycopg, SSL y las variables SUPABASE_DB_* del .env local. Solo consulta identidad, versión y existencia de las cinco tablas dwh; no modifica SQL Server ni implementa cargas READY → DWH.
+
+La [carga controlada READY → DWH](documentation/13_carga_dwh_supabase.md) incorpora prevalidación, dry-run predeterminado, transacción única y comparación idempotente sin borrar ni sobrescribir datos. El dry-run real pasó con las cinco tablas vacías; la ejecución de --execute queda pendiente de autorización expresa.
