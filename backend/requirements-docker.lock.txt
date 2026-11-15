@@ -1,0 +1,24 @@
+# Backend runtime únicamente; Linux x86_64 / Python 3.13.
+# Derivado de backend/requirements.txt y sus versiones instaladas probadas.
+# No es pip freeze de toda .venv; excluye dependencias Windows/ETL/ML/tests.
+annotated-doc==0.0.6
+annotated-types==0.8.0
+anyio==4.16.0
+cffi==2.1.1
+click==8.5.1
+cryptography==50.0.2
+fastapi==0.163.1
+h11==0.16.0
+idna==3.20
+opentelemetry-api==1.45.2
+psycopg==3.3.9
+psycopg-binary==3.3.9
+pycparser==3.12
+pydantic==2.14.3
+pydantic-core==2.50.4
+pyjwt==2.15.1
+python-dotenv==1.2.4
+starlette==1.10.0
+typing-extensions==4.16.0
+typing-inspection==0.4.5
+uvicorn==0.54.0

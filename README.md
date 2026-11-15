@@ -139,3 +139,9 @@ carreras de sesión y validación de URLs antes del build. `BACKEND_DOCS_ENABLED
 permite desactivar Swagger/OpenAPI en producción. Resultado: 358 pruebas backend y 91
 frontend, TypeScript/build correctos. No hubo cambios remotos ni despliegue.
 [Hallazgos, límites y recomendaciones Docker/Vercel](documentation/26_auditoria_seguridad_estabilidad.md).
+
+### Backend Docker para entrega
+
+Imagen Linux no root del backend, sin ETL, modelos ni secretos; un worker, healthcheck,
+filesystem read-only y límites de recursos. Construida y probada en 127.0.0.1:8001 sin
+interrumpir el backend 8000. [Comandos, configuración y resultados](documentation/27_backend_docker.md).

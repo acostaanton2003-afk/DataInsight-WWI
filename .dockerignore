@@ -1,0 +1,20 @@
+# Allowlist: solo código Python del backend y requisitos de ejecución.
+# Dockerfile se permite para que el build pueda leerlo; no se copia a la imagen.
+**
+!backend
+!backend/Dockerfile
+!backend/requirements-docker.lock.txt
+!backend/__init__.py
+!backend/app
+!backend/app/*.py
+!backend/app/routers
+!backend/app/routers/*.py
+
+# Defensa adicional para futuras ampliaciones de la allowlist.
+**/.env
+**/.env.*
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.key
+**/*.pem

@@ -66,3 +66,6 @@ Desktop.ini
 /data/
 # Incluye raw/, validated/, quarantine/, reports/ y temporales de ejecución; código y documentación se versionan.
 /artifacts/
+
+# Plantilla pública Docker; backend/.env.docker real sigue ignorado.
+!backend/.env.docker.example
