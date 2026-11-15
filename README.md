@@ -131,3 +131,11 @@ React incorpora login/logout con Supabase Auth y envía Bearer a FastAPI. El end
 la instalación remota de roles y ADMIN; esta fase no ejecuta SQL. VIEWER no consulta
 clientes, ML ni asistente. Configurar la Publishable key pública en frontend/.env.local;
 no usar claves privilegiadas. [Instalación, pruebas y limitaciones](documentation/25_login_react_supabase.md).
+
+### Fase 4: auditoría y estabilidad
+
+Se cierran extensiones de rutas que omiten RBAC, se refuerzan claims/headers y se corrigen
+carreras de sesión y validación de URLs antes del build. `BACKEND_DOCS_ENABLED=false`
+permite desactivar Swagger/OpenAPI en producción. Resultado: 358 pruebas backend y 91
+frontend, TypeScript/build correctos. No hubo cambios remotos ni despliegue.
+[Hallazgos, límites y recomendaciones Docker/Vercel](documentation/26_auditoria_seguridad_estabilidad.md).

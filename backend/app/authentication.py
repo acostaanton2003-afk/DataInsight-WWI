@@ -79,7 +79,7 @@ class SessionVerifier:
                         keys[identifier] = PyJWK.from_dict(entry, algorithm='ES256')
                 if not keys:
                     raise ValueError('JWKS sin claves ES256.')
-            except (OSError, ValueError, KeyError, TypeError, jwt.PyJWTError):
+            except (OSError, ValueError, KeyError, TypeError, RecursionError, jwt.PyJWTError):
                 raise AuthenticationUnavailable() from None
             self._keys = keys
             self._expires = monotonic() + 300
@@ -105,6 +105,7 @@ class SessionVerifier:
             if (claims['role'] != 'authenticated' or claims['is_anonymous'] is not False
                     or claims['aal'] not in ('aal1', 'aal2')
                     or type(claims['exp']) is not int or type(claims['iat']) is not int
+                    or ('nbf' in claims and type(claims['nbf']) is not int)
                     or claims['exp'] <= claims['iat']):
                 raise InvalidSession()
             user_id = UUID(claims['sub'])
@@ -112,5 +113,5 @@ class SessionVerifier:
             if user_id.int == 0 or session_id.int == 0:
                 raise InvalidSession()
             return AuthenticatedUser(user_id=user_id, session_id=session_id)
-        except (jwt.PyJWTError, ValueError, TypeError, KeyError, AttributeError):
+        except (jwt.PyJWTError, ValueError, TypeError, KeyError, AttributeError, OverflowError, RecursionError):
             raise InvalidSession() from None

@@ -44,12 +44,26 @@ export function AuthGate({children,client=getSupabaseClient()}: {
 
   useEffect(()=>{
     if(!client)return;
-    let active=true;let events=0;
-    const {data:{subscription}}=client.auth.onAuthStateChange((_event,next)=>{events++;if(active)setSession(next);});
-    void client.auth.getSession().then(({data,error})=>{
-      if(active&&events===0){setSession(error?null:data.session);if(error)setNotice('No se pudo recuperar la sesión. Inicia sesión de nuevo.');}
-    }).catch(()=>{if(active&&events===0){setSession(null);setNotice('No se pudo recuperar la sesión.');}});
-    return ()=>{active=false;subscription.unsubscribe();};
+    let active=true;let revision=0;let timer:number|undefined;
+    async function recover(expected:number) {
+      try {
+        const {data,error}=await client!.auth.getSession();
+        if(active&&expected===revision){
+          setSession(error?null:data.session);
+          if(error)setNotice('No se pudo recuperar la sesión. Inicia sesión de nuevo.');
+        }
+      } catch {
+        if(active&&expected===revision){setSession(null);setNotice('No se pudo recuperar la sesión.');}
+      }
+    }
+    // Events can come from another tab. Read THIS client's storage, not their payload.
+    // Defer SDK calls until after the synchronous auth callback releases its lock.
+    const {data:{subscription}}=client.auth.onAuthStateChange(()=>{
+      const expected=++revision;window.clearTimeout(timer);
+      timer=window.setTimeout(()=>void recover(expected),0);
+    });
+    void recover(++revision);
+    return ()=>{active=false;window.clearTimeout(timer);subscription.unsubscribe();};
   },[client]);
 
   useEffect(()=>{

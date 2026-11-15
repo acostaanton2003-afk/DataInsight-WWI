@@ -1,6 +1,7 @@
 """Bound real request bytes before parsing; add safe response headers."""
 import asyncio
 import logging
+from collections.abc import Callable
 
 from starlette.responses import JSONResponse
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
@@ -29,12 +30,17 @@ async def bounded_body(receive: Receive, maximum: int) -> bytes | None:
 
 
 class SecurityHTTPMiddleware:
-    def __init__(self, app: ASGIApp, max_body_bytes: int = 16384, body_timeout: float = 10) -> None:
+    def __init__(self, app: ASGIApp, max_body_bytes: int = 16384, body_timeout: float = 10,
+                 route_check: Callable[[], bool] | None = None) -> None:
         self.app = app
         self.max_body_bytes = max_body_bytes
         self.body_timeout = body_timeout
+        self.route_check = route_check
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope['type'] == 'websocket':
+            await send({'type': 'websocket.close', 'code': 1008})
+            return
         if scope['type'] != 'http':
             await self.app(scope, receive, send)
             return
@@ -50,6 +56,12 @@ class SecurityHTTPMiddleware:
                 headers.extend((name.lower().encode(), value.encode()) for name, value in SECURITY_HEADERS.items())
                 message = {**message, 'headers': headers}
             await send(message)
+
+        if self.route_check is not None and not self.route_check():
+            logger.error('routing_configuration_rejected')
+            await JSONResponse({'detail': 'Servicio temporalmente no disponible.'},
+                               status_code=503)(scope, receive, secure_send)
+            return
 
         try:
             lengths = [value for key, value in scope.get('headers', []) if key.lower() == b'content-length']

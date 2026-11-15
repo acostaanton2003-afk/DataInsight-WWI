@@ -31,3 +31,8 @@ describe('contrato y transporte',()=>{
     await expect(fetchApi('/kpis',parseKpis,new AbortController().signal)).rejects.toThrow();
   });
 });
+
+it.each(['postgresql://fixture:fixture@db.invalid/database','https://fixture:fixture@api.invalid',
+  'http://external-api.invalid'])('rechaza configuración que filtraría credenciales o Bearer: %s',value=>{
+  expect(()=>apiBase(value)).toThrow();
+});

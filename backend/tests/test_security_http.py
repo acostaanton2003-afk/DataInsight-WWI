@@ -111,3 +111,51 @@ def test_security_middleware_does_not_intercept_lifespan():
     async def app(scope,receive,send):reached(scope['type'])
     asyncio.run(SecurityHTTPMiddleware(app)({'type':'lifespan'},None,None))
     reached.assert_called_once_with('lifespan')
+
+
+@pytest.mark.parametrize('mechanism',['mount','raw','included_raw'])
+def test_unsupported_routes_fail_closed_before_handlers(mechanism):
+    from fastapi import APIRouter, FastAPI
+    from starlette.routing import Route
+    app=create_app(Settings())
+    reached=Mock()
+    async def probe(request):reached();return JSONResponse({'synthetic':True})
+    if mechanism=='mount':
+        child=FastAPI()
+        child.add_route('/probe',probe)
+        app.mount('/unreviewed',child)
+        path='/unreviewed/probe'
+    elif mechanism=='raw':
+        app.add_route('/unreviewed',probe);path='/unreviewed'
+    else:
+        app.include_router(APIRouter(routes=[Route('/unreviewed',probe)]));path='/unreviewed'
+    app.state.session_verifier=Mock()
+    app.state.role_repository=Mock()
+    with TestClient(app) as client:
+        response=client.get(path)
+    assert response.status_code==503
+    reached.assert_not_called()
+    app.state.role_repository.find.assert_not_called()
+    app.state.session_verifier.verify.assert_not_called()
+    assert response.headers['cache-control']=='no-store'
+
+
+def test_websocket_without_approved_security_is_closed():
+    from starlette.websockets import WebSocketDisconnect
+    app=create_app(Settings())
+    reached=Mock()
+    @app.websocket('/unreviewed-ws')
+    async def probe(socket):reached();await socket.accept()
+    with TestClient(app) as client:
+        with pytest.raises(WebSocketDisconnect) as caught:
+            with client.websocket_connect('/unreviewed-ws'):pass
+    assert caught.value.code==1008
+    reached.assert_not_called()
+
+
+def test_documentation_can_be_disabled_without_affecting_health():
+    with TestClient(create_app(Settings(docs_enabled=False))) as client:
+        for path in ('/docs','/redoc','/openapi.json'):
+            assert client.get(path).status_code==404
+        assert client.get('/api/v1/health').status_code==200
+        assert client.get('/api/v1/kpis').status_code==401

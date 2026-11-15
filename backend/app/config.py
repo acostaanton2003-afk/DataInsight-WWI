@@ -41,6 +41,13 @@ def parse_origins(value):
     return tuple(origins)
 
 
+def boolean_setting(value: str) -> bool:
+    normalized = value.strip().lower()
+    if normalized not in ('true', 'false'):
+        raise ValueError('BACKEND_DOCS_ENABLED debe ser true o false.')
+    return normalized == 'true'
+
+
 def port_number(value):
     try:
         result = int(value)
@@ -106,10 +113,13 @@ class Settings:
     database: ReadOnlyDatabaseSettings = field(default_factory=ReadOnlyDatabaseSettings,repr=False)
     forecast_path: str = field(default='artifacts/machine_learning/published/resumen.json',repr=False)
     assistant: AssistantSettings = field(default_factory=AssistantSettings,repr=False)
+    docs_enabled: bool = True
 
     def __post_init__(self):
         object.__setattr__(self,'port',port_number(self.port))
         object.__setattr__(self,'cors_origins',parse_origins(self.cors_origins))
+        if type(self.docs_enabled) is not bool:
+            raise ValueError('BACKEND_DOCS_ENABLED debe ser booleano.')
         if not self.host or any(character.isspace() for character in self.host) or '://' in self.host:
             raise ValueError('BACKEND_HOST debe ser una dirección de escucha válida.')
 
@@ -133,7 +143,7 @@ def load_settings(env_file=ENV_FILE,environ: Mapping[str,str] | None=None):
         return get('BACKEND_DB_'+name,default) or default
     database = ReadOnlyDatabaseSettings(host=db('HOST'),port=db('PORT','5432'),name=db('NAME'),
                                        user=db('USER'),password=db('PASSWORD'),sslmode=db('SSLMODE','require'))
-    return Settings(auth=AuthSettings(supabase_url=get('SUPABASE_AUTH_URL','')),host=get('BACKEND_HOST','127.0.0.1'),port=get('BACKEND_PORT','8000'),
+    return Settings(docs_enabled=boolean_setting(get('BACKEND_DOCS_ENABLED','true')),auth=AuthSettings(supabase_url=get('SUPABASE_AUTH_URL','')),host=get('BACKEND_HOST','127.0.0.1'),port=get('BACKEND_PORT','8000'),
                     cors_origins=parse_origins(get('CORS_ORIGINS',','.join(DEFAULT_ORIGINS))),database=database,
                     forecast_path=get('BACKEND_FORECAST_PATH','artifacts/machine_learning/published/resumen.json') or 'artifacts/machine_learning/published/resumen.json',
                     assistant=AssistantSettings(provider=get('ASSISTANT_PROVIDER','local'),model=get('ASSISTANT_OLLAMA_MODEL') or ('qwen3:1.7b' if get('ASSISTANT_PROVIDER','local')=='ollama' else ''),

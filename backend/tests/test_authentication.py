@@ -254,3 +254,44 @@ def test_jwks_network_failure_is_throttled(signing, monkeypatch):
         with pytest.raises(AuthenticationUnavailable):
             verifier.verify(token(signing[0]))
     signing[1].assert_called_once_with(AUTH.jwks_url)
+
+
+@pytest.mark.parametrize('nbf',[False,1.5,'1',float('-inf')])
+def test_not_before_requires_integer_numeric_date(protected_client,signing,nbf):
+    response=protected_client.get(PATHS[0],headers={'Authorization':'Bearer '+token(signing[0],{'nbf':nbf})})
+    assert response.status_code==401
+
+
+def test_nonfinite_expiry_is_rejected_safely(protected_client,signing):
+    response=protected_client.get(PATHS[0],headers={'Authorization':'Bearer '+token(signing[0],{'exp':float('inf')})})
+    assert response.status_code==401
+
+
+def test_deep_untrusted_header_is_401_before_key_lookup(protected_client,signing):
+    import base64
+    raw=b'{"nested":'+b'['*1500+b'0'+b']'*1500+b'}'
+    encoded=base64.urlsafe_b64encode(raw).decode().rstrip('=')+'.e30.AA'
+    assert protected_client.get(PATHS[0],headers={'Authorization':'Bearer '+encoded}).status_code==401
+    signing[1].assert_not_called()
+
+
+def test_deep_jwks_failure_is_generic_503(protected_client,signing):
+    signing[1].side_effect=RecursionError('private detail')
+    response=protected_client.get(PATHS[0],headers={'Authorization':'Bearer '+token(signing[0])})
+    assert response.status_code==503
+    assert 'private' not in response.text
+
+
+def test_duplicate_authorization_headers_are_rejected(protected_client,signing):
+    encoded=token(signing[0])
+    response=protected_client.get(PATHS[0],headers=[('Authorization','Bearer '+encoded),('Authorization','Bearer different')])
+    assert response.status_code==401
+    signing[1].assert_not_called()
+
+
+def test_cookie_and_cross_origin_form_do_not_authenticate(protected_client,signing):
+    response=protected_client.post(PATHS[-1],content='pregunta=Resumen+de+ventas',headers={
+        'Origin':'https://attacker.invalid','Cookie':'access_token=synthetic-session',
+        'Content-Type':'application/x-www-form-urlencoded'})
+    assert response.status_code==401
+    signing[1].assert_not_called()

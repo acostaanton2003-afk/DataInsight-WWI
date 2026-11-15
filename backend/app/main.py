@@ -6,6 +6,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from backend.app.role_repository import RoleRepository
+from backend.app.route_security import routes_are_guarded
 from backend.app.rate_limit import AssistantRateLimiter
 from backend.app.security_http import SecurityHTTPMiddleware, SECURITY_HEADERS, logger
 
@@ -23,12 +24,17 @@ from backend.app.routers.assistant import router as assistant_router
 def create_app(settings: Settings | None=None):
     settings = load_settings() if settings is None else settings
     application = FastAPI(dependencies=[Depends(require_business_access)], title='DataInsight WWI',version=__version__,
-                          description='Analítica de ventas del DWH con conexión de solo lectura; health independiente.')
+                          description='Analítica de ventas del DWH con conexión de solo lectura; health independiente.',
+                          docs_url='/docs' if settings.docs_enabled else None,
+                          redoc_url='/redoc' if settings.docs_enabled else None,
+                          openapi_url='/openapi.json' if settings.docs_enabled else None)
     application.state.settings = settings
     application.state.session_verifier = SessionVerifier(settings.auth)
     application.state.role_repository = RoleRepository(settings.database)
     application.state.assistant_limiter = AssistantRateLimiter()
-    application.add_middleware(SecurityHTTPMiddleware)
+    framework_routes = tuple(application.routes)
+    application.add_middleware(SecurityHTTPMiddleware,
+        route_check=lambda: routes_are_guarded(application.routes, framework_routes))
 
     @application.exception_handler(RequestValidationError)
     async def invalid_request(request, error):

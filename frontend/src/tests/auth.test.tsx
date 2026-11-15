@@ -1,3 +1,4 @@
+import {validateSupabaseUrl} from '../lib/authConfig';
 import {it,expect,vi} from 'vitest';
 import {render,screen,fireEvent,waitFor,act} from '@testing-library/react';
 import type {Session,SupabaseClient} from '@supabase/supabase-js';
@@ -21,14 +22,14 @@ function session(token='synthetic-test-token',expires=Math.floor(Date.now()/1000
 function fakeClient(initial:Session|null=null){
   let listener:((event:string,next:Session|null)=>void)|undefined;
   const unsubscribe=vi.fn();
-  const emit=(next:Session|null)=>listener?.(next?'TOKEN_REFRESHED':'SIGNED_OUT',next);
+  const emit=(next:Session|null)=>{auth.getSession.mockResolvedValue({data:{session:next},error:null});listener?.(next?'TOKEN_REFRESHED':'SIGNED_OUT',next);};
   const auth={
     getSession:vi.fn().mockResolvedValue({data:{session:initial},error:null}),
     onAuthStateChange:vi.fn(callback=>{listener=callback;return {data:{subscription:{unsubscribe}}};}),
     signInWithPassword:vi.fn().mockImplementation(async()=>{emit(session());return {data:{session:session()},error:null};}),
     signOut:vi.fn().mockImplementation(async()=>{emit(null);return {error:null};}),
   };
-  return {client:{auth} as unknown as SupabaseClient,auth,emit,unsubscribe};
+  return {client:{auth} as unknown as SupabaseClient,auth,emit,unsubscribe,foreign:(next:Session)=>listener?.('SIGNED_IN',next)};
 }
 function mockFetch(role:Role='ADMIN'){
   const values:Record<string,unknown>={'/auth/me':identity(role),'/kpis':kpis,'/ventas/por-mes':months,
@@ -171,4 +172,25 @@ it('envía el Bearer también en POST del asistente',async()=>{
 it('un perfil de otro usuario no monta contenido',async()=>{
   const fake=fakeClient(session());vi.stubGlobal('fetch',vi.fn().mockResolvedValue(new Response(JSON.stringify({...identity(),user_id:'22222222-2222-4222-8222-222222222222'}))));
   gated(fake.client);await screen.findByRole('alert');expect(screen.queryByText('Contenido protegido')).toBeNull();
+});
+
+it('un 403 de un token anterior no retira la sesión nueva',async()=>{
+  const listener=vi.fn();window.addEventListener(FORBIDDEN_EVENT,listener);
+  vi.mocked(getAccessToken).mockResolvedValueOnce('synthetic-old').mockResolvedValueOnce('synthetic-current');
+  vi.stubGlobal('fetch',vi.fn().mockResolvedValue(new Response('',{status:403})));
+  await expect(requestJson('/api/v1/clientes/top',new AbortController().signal)).rejects.toMatchObject({status:403});
+  expect(listener).not.toHaveBeenCalled();window.removeEventListener(FORBIDDEN_EVENT,listener);
+});
+it('ignora el payload de sesión de otra pestaña y recupera su almacenamiento propio',async()=>{
+  const fake=fakeClient(session());const fetch=mockFetch();gated(fake.client);await screen.findByText('Contenido protegido');
+  const foreign=session('synthetic-foreign');foreign.user={...foreign.user,id:'22222222-2222-4222-8222-222222222222'};
+  act(()=>fake.foreign(foreign));
+  await waitFor(()=>expect(fake.auth.getSession).toHaveBeenCalledTimes(2));
+  expect(screen.getByText('Contenido protegido')).toBeTruthy();expect(fetch).toHaveBeenCalledTimes(1);
+});
+
+it('valida URL pública sin depender de que exista la clave',()=>{
+  expect(()=>validateSupabaseUrl('https://fixture:fixture@abcdefghijklmnopqrst.supabase.co')).toThrow();
+  expect(()=>validateSupabaseUrl('postgresql://fixture:fixture@db.invalid/database')).toThrow();
+  expect(validateSupabaseUrl('https://abcdefghijklmnopqrst.supabase.co/')).toBe('https://abcdefghijklmnopqrst.supabase.co');
 });

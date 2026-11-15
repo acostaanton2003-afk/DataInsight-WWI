@@ -1,3 +1,5 @@
+import {apiBase} from './apiConfig';
+export {apiBase} from './apiConfig';
 import {getAccessToken} from './supabase';
 
 export const UNAUTHORIZED_EVENT = 'datainsight:unauthorized';
@@ -14,12 +16,6 @@ export class ApiError extends Error {
 export function errorMessage(error: unknown): string {
   return error instanceof ApiError ? error.message : 'No se pudo consultar la API. Comprueba la conexión y reintenta.';
 }
-export function apiBase(value: string): string {
-  const url = new URL(value);
-  if (!['http:','https:'].includes(url.protocol) || url.username || url.password || url.search || url.hash ||
-      (url.protocol === 'http:' && !['localhost','127.0.0.1','[::1]'].includes(url.hostname))) throw new Error('URL de API no válida.');
-  return url.toString().replace(/\/$/,'');
-}
 export async function requestJson(path: string, signal: AbortSignal, body?: unknown): Promise<unknown> {
   if (!path.startsWith('/api/v1/') || path.includes('://')) throw new Error('Ruta de API no válida.');
   const token = await getAccessToken();
@@ -34,8 +30,13 @@ export async function requestJson(path: string, signal: AbortSignal, body?: unkn
     ...(body === undefined ? {} : {body:JSON.stringify(body)}),
   });
   if (!response.ok) {
-    if (response.status === 401 && !signal.aborted && token === await getAccessToken()) window.dispatchEvent(new Event(UNAUTHORIZED_EVENT));
-    if (response.status === 403 && path !== '/api/v1/auth/me' && !signal.aborted) window.dispatchEvent(new Event(FORBIDDEN_EVENT));
+    if ((response.status === 401 || response.status === 403) && !signal.aborted) {
+      const currentToken = await getAccessToken();
+      if (!signal.aborted && token === currentToken) {
+        if (response.status === 401) window.dispatchEvent(new Event(UNAUTHORIZED_EVENT));
+        if (response.status === 403 && path !== '/api/v1/auth/me') window.dispatchEvent(new Event(FORBIDDEN_EVENT));
+      }
+    }
     throw new ApiError(response.status);
   }
   return response.json();

@@ -75,3 +75,13 @@ def test_invalid_backend_port_is_rejected(port):
 def test_future_database_requires_encryption(mode):
     with pytest.raises(ValueError,match='SSL'):
         ReadOnlyDatabaseSettings(sslmode=mode)
+
+
+@pytest.mark.parametrize('value,expected',[('true',True),('false',False),(' FALSE ',False)])
+def test_docs_setting_from_environment(value,expected):
+    assert load_settings(None,{'BACKEND_DOCS_ENABLED':value}).docs_enabled is expected
+
+
+@pytest.mark.parametrize('value',['yes','0','unexpected'])
+def test_invalid_docs_setting_fails_closed(value):
+    with pytest.raises(ValueError):load_settings(None,{'BACKEND_DOCS_ENABLED':value})

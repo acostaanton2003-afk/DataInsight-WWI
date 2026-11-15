@@ -1,13 +1,16 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import {loadEnv} from 'vite';
-import {publicAuthConfig} from './src/lib/authConfig.ts';
+import {publicAuthConfig,validateSupabaseUrl} from './src/lib/authConfig.ts';
+import {apiBase} from './src/lib/apiConfig.ts';
 export default defineConfig(({mode})=>{
   const values=loadEnv(mode,'.','VITE_');
   const key=values.VITE_SUPABASE_PUBLISHABLE_KEY ?? '';
   const url=values.VITE_SUPABASE_URL ?? '';
   // Fail before bundling a mistakenly configured private credential. Never echo it.
+  if(url)validateSupabaseUrl(url);
   if(key)publicAuthConfig(url,key);
+  if(values.VITE_API_BASE_URL)apiBase(values.VITE_API_BASE_URL);
   return {
   plugins: [react()],
   test: { environment: 'jsdom', setupFiles: './src/tests/setup.ts', maxWorkers: 1 },

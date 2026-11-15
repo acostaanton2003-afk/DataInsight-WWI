@@ -21,7 +21,7 @@ def get_authenticated_user(
     request: Request,
     credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer_scheme)],
 ) -> AuthenticatedUser:
-    if credentials is None:
+    if credentials is None or len(request.headers.getlist('authorization')) != 1:
         logger.info('authentication_denied reason=missing_session')
         raise HTTPException(401, 'Se requiere una sesión válida.', headers={'WWW-Authenticate': 'Bearer'})
     try:
