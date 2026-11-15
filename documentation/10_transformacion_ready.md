@@ -6,7 +6,7 @@
 
 Se revisaron `09_modelo_dimensional.md`, `01_modelo_logico.sql`, el análisis local del modelo, `validar_raw.py`, el esquema real y las cabeceras de la ejecución validadora completa. **No se detectaron diferencias de columnas.** Una prueba automatizada comprueba que las cabeceras READY coinciden exactamente, incluso en orden, con las columnas del borrador lógico.
 
-Hay una decisión técnica que debe conservarse en una futura carga: el borrador propone identidades PostgreSQL, pero READY materializa claves técnicas reproducibles. También materializa `ventas_sin_impuestos` y `tiene_factura`, que el DDL define como columnas generadas. Esta etapa no modifica el DDL: una futura carga deberá preservar las claves explícitas, gestionar las identidades/secuencias y dejar que PostgreSQL calcule las columnas generadas o comprobar su equivalencia. En identidades ALWAYS, preservar claves explícitas requeriría el mecanismo apropiado de override. No se ha implementado esa carga ni se deben importar estos CSV ciegamente como si fueran un COPY ya diseñado.
+El borrador lógico histórico propuso identidades, pero la [revisión física vigente](11_creacion_dwh_supabase.md) utiliza BIGINT PRIMARY KEY explícitas, sin IDENTITY, para cliente_key, producto_key, venta_key y pedido_key. READY ya calcula esas claves reproducibles y no se requieren secuencias. ventas_sin_impuestos y tiene_factura se mantienen generadas en PostgreSQL: la futura carga deberá excluir sus valores materializados tanto de la cabecera/fila enviada como de las columnas de destino, y conciliarlos después. No se ha implementado esa carga ni se deben enviar intactos los CSV de hechos a una lista de destino reducida.
 
 | CSV | Tabla lógica | Grano |
 | --- | --- | --- |

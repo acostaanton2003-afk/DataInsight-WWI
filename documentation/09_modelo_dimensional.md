@@ -233,3 +233,7 @@ El análisis imprime JSON. Código 0: controles ejecutados correctos; 2: incumpl
 Las pruebas nuevas usan datos ficticios y verifican dos líneas del mismo artículo/factura, roles de cliente distintos, duplicación de padres, huérfanos, OrderID NULL permitido, tolerancia decimal, importes incompletos, cobertura de columnas y rechazo del modo muestra. La suite completa tiene **34 pruebas aprobadas**, sin dependencias nuevas.
 
 Pendientes: revisión de negocio de moneda, notas de crédito, unidades y tolerancia; historia de dimensiones; extracción de catálogos si se requieren etiquetas; diseño físico e índices; aprobación/ejecución del DDL; política de desconocidos tardíos; cargas y conciliación sobre un DWH real. Ninguna de esas etapas se implementa aquí.
+
+## Evolución física posterior
+
+El borrador lógico de esta etapa conserva la propuesta histórica de identidades. La [definición física revisada](11_creacion_dwh_supabase.md) las reemplaza por BIGINT PRIMARY KEY explícitas en las cuatro claves técnicas que ya suministra READY. No se cambian columnas, granos ni relaciones; las dos expresiones de negocio continúan como columnas generadas. El DDL físico vigente está en 03_creacion_tablas_dwh.sql y no se ha ejecutado desde esta preparación.
