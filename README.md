@@ -88,3 +88,5 @@ La [carga controlada READY → DWH](documentation/13_carga_dwh_supabase.md) inco
 El [backend inicial FastAPI](documentation/14_backend_fastapi.md) ofrece GET /api/v1/health, Swagger y CORS local configurable, con dependencias y pruebas separadas. Iniciar desde la raíz con `.\.venv\Scripts\python.exe -m backend` y abrir http://127.0.0.1:8000/docs. La API todavía no conecta PostgreSQL ni expone endpoints de negocio.
 
 La [conexion lectora del backend al DWH](documentation/15_conexion_backend_dwh.md) incorpora psycopg y verificacion de visibilidad RLS. Los scripts de rol y la propuesta de politicas quedan para revisi?n y autorizacion manual; no se ejecutan al iniciar FastAPI.
+
+Los [primeros endpoints analíticos](documentation/16_endpoints_analiticos.md) ofrecen KPI, ventas mensuales y rankings de productos/clientes mediante SELECT del rol lector. Los importes JSON se conservan como cadenas decimales; Swagger permite probar las cuatro rutas sin modificar el DWH.

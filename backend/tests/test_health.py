@@ -18,10 +18,10 @@ def test_swagger_and_openapi(client):
     schema=client.get('/openapi.json').json()
     assert schema['info']['title']=='DataInsight WWI'
     assert schema['info']['version']==__version__
-    assert set(schema['paths'])=={'/api/v1/health'}
+    assert set(schema['paths'])=={'/api/v1/health','/api/v1/kpis','/api/v1/ventas/por-mes','/api/v1/productos/top','/api/v1/clientes/top'}
 
 
-@pytest.mark.parametrize('path',['/api/v1/sales','/api/v1/clientes','/api/v1/productos','/api/v1/kpis'])
+@pytest.mark.parametrize('path',['/api/v1/sales','/api/v1/clientes','/api/v1/productos'])
 def test_business_endpoints_are_not_implemented(client,path):
     assert client.get(path).status_code==404
 
