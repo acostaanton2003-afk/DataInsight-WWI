@@ -76,3 +76,5 @@ La [validación RAW → VALIDATED](documentation/07_validacion_calidad.md) separ
 La [extracción completa](documentation/08_extraccion_completa.md) añade modos muestra/completo, lotes configurables (500 por defecto), conteos contra SQL Server y directorios RAW por ejecución. La muestra sigue siendo el modo predeterminado y el validador acepta --raw-dir.
 
 El [modelo dimensional de ventas](documentation/09_modelo_dimensional.md) define una estrella al grano de InvoiceLineID, dimensiones de fecha/cliente/producto y seguimiento de pedidos independiente. Incluye un DDL PostgreSQL comentado y comprobaciones locales sobre la extracción completa; no se han creado tablas físicas del DWH ni conectado Supabase.
+
+La [transformación local VALIDATED → READY](documentation/10_transformacion_ready.md) prepara las tres dimensiones y los hechos de ventas/pedidos con claves reproducibles, referencias completas y conciliación por cliente/mes. Guarda ejecuciones independientes en data/ready/; no conecta Supabase ni carga el DWH físico.

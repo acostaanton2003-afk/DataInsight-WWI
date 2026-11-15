@@ -1,0 +1,22 @@
+{
+  "20261115T044925Z-474e2802f9394e44855c01a4fc87e9e6": {
+    "descripcion": "Referencia de la extracción completa actual, no umbrales universales.",
+    "metricas": {
+      "fact_ventas_rows": 228265,
+      "fact_pedidos_rows": 73595,
+      "facturas_distintas": 70510,
+      "pedidos_sin_factura": 3085,
+      "meses": 41,
+      "ventas_sin_impuestos": "172261341.20",
+      "impuestos": "25782098.25",
+      "ventas_con_impuestos": "198043439.45"
+    },
+    "validated_sha256": {
+      "Sales.Orders": "b18ee6638aeedd5c1f97128e12753753cc0c4a21e6b36df47817f2afc61d11a7",
+      "Sales.Invoices": "febcafe75151cc2ae1a099f201f4f082f6820ad3f7ce926c859a8375ce1993de",
+      "Sales.InvoiceLines": "412236b6b0685d5a40061029f8477bf1471f6e64e3453738eb507b6aa565eaaf",
+      "Sales.Customers": "de2c12e5cd7b1c43af6784ebbc0145b8272ddaad808716674e46742f5688a966",
+      "Warehouse.StockItems": "3d5db8c09ed198a93f75ffc8e71b43d113ee730bf32c4b299e3f7e2a2a092fdb"
+    }
+  }
+}
