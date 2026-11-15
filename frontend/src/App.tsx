@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 import { parseKpis, parseMonths, parseProducts, parseCustomers, type Month } from './lib/api';
 import { useResource } from './lib/useResource';
+import { parsePredictions } from './lib/predictions';
+import { PredictionsPanel } from './components/PredictionsPanel';
 import { formatAmount, formatCount, monthLabel } from './lib/format';
 import { Icon } from './components/Icon';
 import { Chart } from './components/Chart';
@@ -35,7 +37,8 @@ export default function App() {
   const months=useResource('/ventas/por-mes',parseMonths,refresh);
   const products=useResource('/productos/top?limit=10',parseProducts,refresh);
   const customers=useResource('/clientes/top?limit=10',parseCustomers,refresh);
-  const states=[kpis.state,months.state,products.state,customers.state];
+  const predictions=useResource('/predicciones/ventas',parsePredictions,refresh);
+  const states=[kpis.state,months.state,products.state,customers.state,predictions.state];
   const loading=states.some(state=>state.status==='loading');
   const errors=states.some(state=>state.status==='error');
   const updated=states.flatMap(state=>state.status==='success'?[state.updated.getTime()]:[]);
@@ -45,7 +48,7 @@ export default function App() {
     <a className="skip-link" href="#contenido">Ir al contenido</a>
     <aside className="sidebar"><a className="brand" href="#resumen" aria-label="DataInsight WWI, inicio"><span className="brand-mark"><Icon name="grid" size={24}/></span><span>DataInsight<small>WIDE WORLD IMPORTERS</small></span></a>
       <div className="workspace-label">ESPACIO DE ANÁLISIS</div>
-      <nav aria-label="Navegación principal"><a className="nav-current" href="#resumen"><Icon name="grid"/>Resumen de ventas</a><a href="#ventas"><Icon name="trend"/>Evolución mensual</a><a href="#productos"><Icon name="box"/>Productos</a><a href="#clientes"><Icon name="people"/>Clientes</a></nav>
+      <nav aria-label="Navegación principal"><a className="nav-current" href="#resumen"><Icon name="grid"/>Resumen de ventas</a><a href="#ventas"><Icon name="trend"/>Evolución mensual</a><a href="#productos"><Icon name="box"/>Productos</a><a href="#clientes"><Icon name="people"/>Clientes</a><a href="#predicciones"><Icon name="trend"/>Predicciones</a></nav>
       <div className="sidebar-note"><div className="note-symbol"><Icon name="trend"/></div><strong>Una visión más clara.</strong><p>Explora las ventas, los productos y quienes impulsan el negocio.</p><span>DATAINSIGHT / WWI</span></div>
       <div className="sidebar-footer"><span className="sidebar-dot"/>Análisis histórico de ventas</div>
     </aside>
@@ -68,6 +71,7 @@ export default function App() {
         </section><section className="panel" id="clientes" aria-labelledby="customers-title"><div className="panel-heading"><div><span className="section-index">03 / CLIENTES</span><h2 id="customers-title">Clientes que impulsan las ventas</h2><p>Top 10 por ventas sin impuestos</p></div><span className="top-label">TOP 10</span></div>
           <ResourceView state={customers.state} retry={customers.reload} isEmpty={rows=>rows.length===0}>{rows=><Ranking label="Top 10 clientes por ventas sin impuestos" color="#6684a3" rows={rows.map(row=>({key:row.cliente_key,id:row.customer_id,name:row.customer_name,amount:row.ventas_sin_impuestos}))}/>}</ResourceView>
         </section></div>
+        <PredictionsPanel prediction={predictions} history={months}/>
         <footer className="main-footer"><p><strong>Sobre estos indicadores</strong> Ventas y facturas excluyen notas de crédito. Clientes corresponde al maestro, sin el miembro desconocido. Importes sin símbolo: la moneda no está verificada.</p><span>DataInsight WWI <b>·</b> WideWorldImporters</span></footer>
       </main>
     </div>

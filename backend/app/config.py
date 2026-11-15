@@ -82,6 +82,7 @@ class Settings:
     port: int = 8000
     cors_origins: tuple[str,...] = DEFAULT_ORIGINS
     database: ReadOnlyDatabaseSettings = field(default_factory=ReadOnlyDatabaseSettings,repr=False)
+    forecast_path: str = field(default='artifacts/machine_learning/published/resumen.json',repr=False)
 
     def __post_init__(self):
         object.__setattr__(self,'port',port_number(self.port))
@@ -110,4 +111,5 @@ def load_settings(env_file=ENV_FILE,environ: Mapping[str,str] | None=None):
     database = ReadOnlyDatabaseSettings(host=db('HOST'),port=db('PORT','5432'),name=db('NAME'),
                                        user=db('USER'),password=db('PASSWORD'),sslmode=db('SSLMODE','require'))
     return Settings(host=get('BACKEND_HOST','127.0.0.1'),port=get('BACKEND_PORT','8000'),
-                    cors_origins=parse_origins(get('CORS_ORIGINS',','.join(DEFAULT_ORIGINS))),database=database)
+                    cors_origins=parse_origins(get('CORS_ORIGINS',','.join(DEFAULT_ORIGINS))),database=database,
+                    forecast_path=get('BACKEND_FORECAST_PATH','artifacts/machine_learning/published/resumen.json') or 'artifacts/machine_learning/published/resumen.json')

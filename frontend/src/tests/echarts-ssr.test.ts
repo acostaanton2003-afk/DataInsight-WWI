@@ -5,6 +5,9 @@ import {LineChart,BarChart} from 'echarts/charts';
 import {GridComponent,TooltipComponent,AriaComponent} from 'echarts/components';
 import {SVGRenderer} from 'echarts/renderers';
 import {monthlyOption,rankingOption} from '../components/charts';
+import {predictionOption} from '../components/predictionChart';
+import {parsePredictions} from '../lib/predictions';
+import {predictions,months} from './fixtures';
 use([LineChart,BarChart,GridComponent,TooltipComponent,AriaComponent,SVGRenderer]);
 it('ECharts real genera SVG mensual y de ranking sin navegador',()=>{
   const options=[monthlyOption([{anio:2013,mes:1,importe:'30.00',cantidad_facturas:2},{anio:2013,mes:2,importe:'40.00',cantidad_facturas:3}]),
@@ -40,4 +43,11 @@ it('ranking adaptable: etiquetas en dos líneas, grid válido y sin aviso legado
     } finally {chart.dispose();}
   }
   expect([...warn.mock.calls,...error.mock.calls].flat().join(' ')).not.toMatch(/containLabel|useLegacyGridContainLabel/);
+});
+
+it('gráfico de predicciones real genera SVG con históricos y bandas sin NaN',()=>{
+  const chart=init(null,undefined,{renderer:'svg',ssr:true,width:341,height:320});
+  try{chart.setOption({...predictionOption(months,parsePredictions(predictions)),animation:false});
+    const svg=chart.renderToSVGString();expect(svg).toContain('<path');expect(svg).not.toContain('NaN');
+  }finally{chart.dispose();}
 });

@@ -2,3 +2,13 @@
 
 /* Ajustes estrechos: seis tarjetas en parejas, sin cambiar escritorio. */
 @media(max-width:420px){main{padding-left:16px;padding-right:16px}.kpi-card{padding:12px}.kpi-top{min-height:32px;align-items:flex-start}.kpi-icon{flex-shrink:0}.kpi-value{font-size:18px;letter-spacing:-.6px}.kpi-card p{line-height:1.6}.panel-heading{flex-wrap:wrap}.top-label{margin-top:0}}
+
+.predictions-panel{margin-top:23px}.experimental-warning,.coverage-warning{margin:14px 24px;padding:12px 14px;border:1px solid #eee0bf;background:#fff9ed;color:#826429;font-size:11px;line-height:1.8;border-radius:6px}.experimental-warning{font-weight:550}.coverage-warning strong{display:block}.forecast-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding:4px 24px}.forecast-metrics article{border:1px solid #e0e8e8;border-radius:7px;padding:14px;min-width:0;background:#f9fbfb}.forecast-metrics span,.forecast-metrics small{display:block;color:#6f858d;font-size:10px}.forecast-metrics strong{display:block;margin:10px 0;font-size:18px;font-weight:550;overflow-wrap:anywhere}.forecast-metrics small{font-size:9px;line-height:1.6}.forecast-legend{display:flex;flex-wrap:wrap;gap:16px;margin:18px 24px 0;font-size:10px;color:#6f858d}.forecast-legend span{display:flex;gap:6px;align-items:center}.forecast-legend i{display:inline-block;width:18px}.real-line{border-top:2px solid #168a80}.forecast-line{border-top:2px dashed #c58b33}.forecast-band{height:9px;background:rgba(203,145,54,.22)}.forecast-note{margin:8px 24px 16px;font-size:10px;line-height:1.8;color:#70858d}@media(max-width:760px){.forecast-metrics{grid-template-columns:repeat(2,minmax(0,1fr));padding:4px 16px;gap:10px}.forecast-metrics strong{font-size:16px}.experimental-warning,.coverage-warning{margin:12px 16px}.forecast-legend{margin-left:16px;margin-right:16px;gap:12px}.forecast-note{margin-left:16px;margin-right:16px}}
+
+/* Solo tabla de pronósticos: contener su ancho intrínseco y desplazar dentro. */
+.forecast-table-scroll{width:100%;max-width:100%;min-width:0;contain:inline-size;overflow-x:auto;overscroll-behavior-x:contain}
+.forecast-table-scroll table{min-width:36rem}
+.forecast-table-scroll th,.forecast-table-scroll td{white-space:nowrap}
+.forecast-table-scroll:focus-visible{outline:2px solid #168a80;outline-offset:-2px}
+.forecast-table-hint{display:none}
+@media(max-width:760px){.forecast-table-hint{display:block;margin:12px 16px 8px;color:#6f858d;font-size:10px;line-height:1.6}}

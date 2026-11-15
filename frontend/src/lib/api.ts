@@ -7,14 +7,14 @@ export interface Product { producto_key: number; stock_item_id: number | null; s
 export interface Customer { cliente_key: number; customer_id: number | null; customer_name: string; ventas_sin_impuestos: string }
 export type Parser<T> = (value: unknown) => T;
 const invalid = () => { throw new Error('Respuesta de la API no válida.'); };
-function object(value: unknown): Record<string, unknown> {
+export function object(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return invalid();
   return value as Record<string, unknown>;
 }
-const count = (value: unknown): number => typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 ? value : invalid();
+export const count = (value: unknown): number => typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 ? value : invalid();
 const id = (value: unknown): number | null => value === null ? null : count(value);
-const text = (value: unknown): string => typeof value === 'string' ? value : invalid();
-const amount = (value: unknown): string => typeof value === 'string' && /^-?\d+\.\d{2}$/.test(value) ? value : invalid();
+export const text = (value: unknown): string => typeof value === 'string' ? value : invalid();
+export const amount = (value: unknown): string => typeof value === 'string' && /^-?\d+\.\d{2}$/.test(value) ? value : invalid();
 function list<T>(value: unknown, parse: Parser<T>): T[] { return Array.isArray(value) ? value.map(parse) : invalid(); }
 export const parseKpis: Parser<Kpis> = value => {
   const row = object(value);

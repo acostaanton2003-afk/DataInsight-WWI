@@ -7,6 +7,7 @@ from backend import __version__
 from backend.app.config import Settings, load_settings
 from backend.app.routers.health import router as health_router
 from backend.app.routers.analytics import router as analytics_router
+from backend.app.routers.predictions import router as predictions_router
 
 
 def create_app(settings: Settings | None=None):
@@ -19,6 +20,7 @@ def create_app(settings: Settings | None=None):
                                allow_headers=['Accept','Content-Type'])
     application.include_router(health_router)
     application.include_router(analytics_router)
+    application.include_router(predictions_router)
     return application
 
 
