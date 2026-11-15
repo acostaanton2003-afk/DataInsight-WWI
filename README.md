@@ -90,3 +90,5 @@ El [backend inicial FastAPI](documentation/14_backend_fastapi.md) ofrece GET /ap
 La [conexion lectora del backend al DWH](documentation/15_conexion_backend_dwh.md) incorpora psycopg y verificacion de visibilidad RLS. Los scripts de rol y la propuesta de politicas quedan para revisi?n y autorizacion manual; no se ejecutan al iniciar FastAPI.
 
 Los [primeros endpoints analíticos](documentation/16_endpoints_analiticos.md) ofrecen KPI, ventas mensuales y rankings de productos/clientes mediante SELECT del rol lector. Los importes JSON se conservan como cadenas decimales; Swagger permite probar las cuatro rutas sin modificar el DWH.
+
+El [dashboard React + Vite + ECharts](documentation/17_dashboard_react.md) consume los cuatro endpoints analíticos del backend y muestra KPI, ventas mensuales y rankings, con importes exactos, errores y reintentos por sección. Desde la raíz: `npm.cmd --prefix frontend ci` y `npm.cmd --prefix frontend run dev`, con FastAPI iniciado en otra terminal. Abrir http://127.0.0.1:5173.
