@@ -104,3 +104,20 @@ Referencias técnicas: [Vite](https://vite.dev/guide/), [importación modular EC
 Revisión visual manual pendiente: abrir el dashboard con FastAPI activo, confirmar seis tarjetas y tres gráficos; pasar el puntero por meses/barras; expandir tablas; comprobar nombres completos e importes; probar navegación con Tab y enlaces laterales; reducir ventana a 390 px y confirmar ausencia de desbordamiento de la página (las tablas sí pueden desplazarse internamente). Detener FastAPI, actualizar y comprobar errores con Reintentar; reiniciarlo y reintentar. Las pruebas automáticas ya cubren los estados de carga/error/vacío y cancelación con datos ficticios.
 
 Archivos de la etapa: frontend/package.json y package-lock.json, index.html, .env.example, tsconfig.json, vite.config.ts; src/main.tsx, App.tsx, styles.css, vite-env.d.ts; src/lib (contratos/transporte, formato exacto, hook de consulta); src/components (Icon, SectionState, ResourceView, Chart y opciones ECharts); src/tests (fixtures y seis suites). README y esta documentación actualizados. .gitignore existente ya excluye dependencias, dist y variables locales sin ocultar código ni ejemplos. No hubo commit ni modificación de datos/DDL.
+
+## Ajustes finales de interfaz y ECharts 6.1.0
+
+La versión inicial fue verificada visualmente por el usuario en escritorio y a 493 px. En esta revisión se conservaron sidebar, colores y disposición de escritorio. En móvil, las seis tarjetas usan dos columnas y tres filas: Total facturado ya no ocupa una fila completa ni provoca una última tarjeta aislada. Los importes ajustan tamaño y espaciado; por debajo de 420 px se reducen los márgenes para conservar espacio a 375 px. No se ocultan ni redondean importes.
+
+Rankings: se eliminó grid.containLabel y se configuraron grid.outerBounds y outerBoundsContain:'axisLabel', conforme a los tipos e implementación de ECharts 6.1.0 instalados. No se importó la extensión de compatibilidad LegacyGridContainLabel. Etiquetas de hasta dos líneas, con 180 px en contenedores amplios y 130 px en contenedores de hasta 460 px; los rankings móviles tienen 410 px de alto para evitar superposición entre diez puestos. La variante por defecto restaura las medidas de escritorio al ampliar la ventana. Los nombres que aún excedan dos líneas conservan texto completo en tooltip y tabla. Los tooltips permanecen en richText, con importe decimal exacto, y se confinan al gráfico; los de ranking ajustan texto largo a 250 px.
+
+Se añadieron frontend/public/favicon.svg y favicon.ico, originales y ligeros, en azul oscuro/verde azulado. index.html declara SVG como principal e ICO como alternativa. Ambos se incluyen en dist sin añadir dependencias.
+
+Verificación de esta revisión:
+
+- 37 pruebas frontend aprobadas; typecheck y build correctos.
+- Regresión ECharts real con SVG en anchos interiores 341, 451 y 534 px (representativos de tarjetas móviles a 375/493 px y de escritorio), nombres largos y cambio posterior a 700 px. Comprueba ausencia del aviso containLabel/LegacyGridContainLabel, conservación de etiquetas y restauración del ancho de escritorio; no sustituye una inspección visual del navegador.
+- /, /favicon.svg y /favicon.ico respondieron HTTP 200 en el servidor local existente; tipos image/svg+xml e image/x-icon correctos. No se detuvo ese servidor. Si una pestaña conserva el icono anterior, recargar omitiendo caché.
+- No se pudo repetir inspección visual en escritorio/493/375 px porque el navegador automatizado no logra iniciar su kernel. Queda esa revisión manual de los ajustes; no se afirma haber comprobado la consola real del navegador.
+- El aviso ECharts se eliminó en las pruebas de renderizado. El build conserva el aviso informativo de chunk ECharts superior a 500 KB sin comprimir (525.81 KB; 179.30 KB gzip), sin ocultarlo ni cambiar dependencias. No aparecieron otros errores en pruebas, TypeScript o build.
+- No se modificaron llamadas a los cuatro endpoints, FastAPI, configuración de conexión, Supabase ni DWH. No hubo commit.

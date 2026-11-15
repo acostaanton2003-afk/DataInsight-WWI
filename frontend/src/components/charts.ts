@@ -13,7 +13,7 @@ const base = {
 export function monthlyOption(rows: Month[]): EChartsCoreOption {
   return {...base,
     grid:{left:60,right:22,top:30,bottom:40},
-    tooltip:{trigger:'axis',renderMode:'richText',backgroundColor:'#132b32',borderWidth:0,textStyle:{color:'#fff'},
+    tooltip:{trigger:'axis',renderMode:'richText',confine:true,backgroundColor:'#132b32',borderWidth:0,textStyle:{color:'#fff'},
       formatter:(value:unknown) => {const row=rows[index(value)]; return row ? `${monthLabel(row.anio,row.mes)}\nVentas: ${formatAmount(row.importe)}\nFacturas: ${formatCount(row.cantidad_facturas)}` : ''; }},
     xAxis:{type:'category',boundaryGap:false,data:rows.map(row=>monthLabel(row.anio,row.mes)),
       axisLine:{lineStyle:{color:'#dfe7e7'}},axisTick:{show:false},axisLabel:{fontSize:11,hideOverlap:true}},
@@ -26,13 +26,22 @@ export function monthlyOption(rows: Month[]): EChartsCoreOption {
 export interface RankRow { key:number; id:number|null; name:string; amount:string }
 export function rankingOption(rows:RankRow[], color:string): EChartsCoreOption {
   return {...base,
-    grid:{left:12,right:68,top:12,bottom:28,containLabel:true},
-    tooltip:{trigger:'axis',renderMode:'richText',confine:true,backgroundColor:'#132b32',borderWidth:0,textStyle:{color:'#fff'},
+    grid:{left:12,right:60,top:12,bottom:28,
+      outerBounds:{left:12,right:60,top:12,bottom:28},outerBoundsContain:'axisLabel'},
+    tooltip:{trigger:'axis',renderMode:'richText',confine:true,backgroundColor:'#132b32',borderWidth:0,textStyle:{color:'#fff',fontSize:11,width:250,overflow:'break'},
       formatter:(value:unknown) => {const row=rows[index(value)];return row ? `${row.name}\nID: ${row.id ?? 'Desconocido'}\nVentas: ${formatAmount(row.amount)}` : ''; }},
     xAxis:{type:'value',axisLabel:{formatter:axisAmount,fontSize:10},splitLine:{lineStyle:{color:'#edf1f1',type:'dashed'}}},
     yAxis:{type:'category',inverse:true,data:rows.map((row,i)=>`${String(i+1).padStart(2,'0')}  ${row.name}`),
-      axisLine:{show:false},axisTick:{show:false},axisLabel:{width:145,overflow:'truncate',fontSize:11,color:'#465d65'}},
+      axisLine:{show:false},axisTick:{show:false},axisLabel:{width:180,height:28,overflow:'break',lineOverflow:'truncate',lineHeight:13,fontSize:11,color:'#465d65'}},
     series:[{type:'bar',data:rows.map(row=>Number(row.amount)),barMaxWidth:13,
       itemStyle:{color,borderRadius:[0,4,4,0]},label:{show:true,position:'right',formatter:(value:unknown)=>axisAmount(Number(rows[index(value)]?.amount ?? 0)),fontSize:10,color:'#536a72'}}],
+    // ECharts vuelve a aplicar esta variante al redimensionar el contenedor.
+    media:[{query:{maxWidth:460},option:{
+      grid:{right:48,outerBounds:{left:12,right:48,top:12,bottom:28}},
+      yAxis:{axisLabel:{width:130,height:28,fontSize:10,lineHeight:13}},
+    }},{option:{
+      grid:{right:60,outerBounds:{left:12,right:60,top:12,bottom:28}},
+      yAxis:{axisLabel:{width:180,height:28,fontSize:11,lineHeight:13}},
+    }}],
   };
 }
