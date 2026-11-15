@@ -1,4 +1,4 @@
-﻿# Python
+# Python
 __pycache__/
 *.py[cod]
 .pytest_cache/
@@ -64,4 +64,5 @@ Desktop.ini
 
 # Datos locales y exportaciones potencialmente pesadas
 /data/
+# Incluye data/raw/*.csv y temporales; scripts y documentación se versionan.
 /artifacts/

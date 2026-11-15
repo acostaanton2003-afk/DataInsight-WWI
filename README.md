@@ -6,7 +6,7 @@ Primer examen de Tecnologia Emergente.
 
 **DataInsight WWI — Plataforma Integral de Ingeniería de Datos y Analítica Inteligente** es un proyecto universitario que integra datos de WideWorldImporters, los transforma con Python y los organiza en un Data Warehouse en Supabase PostgreSQL. La plataforma ofrecerá consultas mediante una API, dashboards interactivos, modelos de Machine Learning, funciones de IA generativa y alertas automatizadas.
 
-Se inició la etapa ETL con una prueba de conexión de Python a SQL Server. Las transformaciones y cargas siguen pendientes.
+La etapa ETL incluye la conexión de Python a SQL Server y una primera muestra de extracción a CSV RAW. Las transformaciones y cargas siguen pendientes.
 
 ## Tecnologías
 
@@ -68,3 +68,5 @@ Los nombres de las variables son una propuesta inicial y se conectarán al códi
 Desarrollar y ejecutar los componentes por etapas. Utilizar cargas ETL por lotes y conjuntos de datos acotados durante las primeras pruebas. Supabase alojará staging y el Data Warehouse. Planificar el uso de SQL Server según los recursos disponibles y evitar ejecutar simultáneamente todos los componentes locales.
 
 La prueba de conexión usa autenticación integrada de Windows y pyodbc. Consulta [instalación y ejecución en PowerShell](documentation/05_conexion_sqlserver.md). El script lee variables de entorno del proceso; no carga `.env` automáticamente. Esta etapa no implementa transformaciones ni cargas.
+
+La [primera extracción RAW](documentation/06_extraccion_raw.md) guarda muestras de 100 filas por tabla en data/raw/ mediante lotes pequeños. Requiere Python 3.12 o superior. Los CSV locales están excluidos de Git.
